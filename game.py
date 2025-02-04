@@ -5,31 +5,40 @@ import random
 pygame.init()
 
 # Screen settings
-SCREEN_WIDTH = 800
-SCREEN_HEIGHT = 600
+SCREEN_WIDTH = 1280
+SCREEN_HEIGHT = 720
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("Fruit Ninja")
+icon = pygame.image.load("assets/icon.png").convert_alpha()
+try:
+    pygame.display.set_icon(icon)
+except NameError:
+    pass
 
 # Colors
-WHITE = (255, 255, 255)
+YELLOW = (253, 231, 56)
 BLACK = (0, 0, 0)
 RED = (255, 0, 0)
 
 # Clock and font
 clock = pygame.time.Clock()
-font = pygame.font.Font(None, 36)
+big_font = pygame.font.Font('assets/fonts/gamecamper.ttf', 36)
+font = pygame.font.Font('assets/fonts/gamecamper-lite.ttf', 24)
 
 # Load assets
 backgrounds = [pygame.image.load(
-    f"images/background{i}.png") for i in range(1, 3)]
+    f"assets/background{i}.png") for i in range(1, 3)]
 fruit_images = {
-    "apple": pygame.image.load("images/fruits/apple.png"),
-    "banana": pygame.image.load("images/fruits/banana.png"),
-    "bomb": pygame.image.load("images/fruits/bomb.png")
+    "apple": pygame.image.load("assets/fruits/apple.png"),
+    "banana": pygame.image.load("assets/fruits/banana.png"),
+    "bomb": pygame.image.load("assets/fruits/bomb.png"),
+    "melon": pygame.image.load("assets/fruits/melon.png"),
+    "orange": pygame.image.load("assets/fruits/orange.png"),
 }
 
 # Placeholder for sliced GIFs
-gif_frames = {"apple": [], "banana": [], "bomb": []}
+gif_frames = {"apple": [], "banana": [],
+              "bomb": [], "melon": [], "orange": [], }
 
 # Classes
 
@@ -117,13 +126,14 @@ class Game:
         screen.blit(self.background, (0, 0))
         for fruit in self.fruits:
             fruit.draw(screen)
-        score_text = font.render(f"Score: {self.score}", True, WHITE)
-        lives_text = font.render(f"Lives: {self.lives}", True, RED)
+        score_text = big_font.render(f"{self.score}", True, YELLOW)
         highscore_text = font.render(
-            f"Highscore: {self.highscore}", True, WHITE)
-        screen.blit(score_text, (10, 10))
-        screen.blit(lives_text, (10, 50))
-        screen.blit(highscore_text, (10, 90))
+            f"Best: {self.highscore}", True, YELLOW)
+        lives_text = font.render(f"Lives: {self.lives}", True, YELLOW)
+        screen.blit(icon, (20, 20))
+        screen.blit(score_text, (120, 20))
+        screen.blit(highscore_text, (20, 110))
+        screen.blit(lives_text, (20, 160))
 
     def run(self):
         while self.running:
