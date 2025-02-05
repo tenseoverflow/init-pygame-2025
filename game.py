@@ -1,5 +1,6 @@
 import pygame
 import random
+from PIL import Image
 
 # Initialize Pygame
 pygame.init()
@@ -18,53 +19,91 @@ except NameError:
 # Colors
 YELLOW = (253, 231, 56)
 BLACK = (0, 0, 0)
-RED = (255, 0, 0)
 
 # Clock and font
 clock = pygame.time.Clock()
 big_font = pygame.font.Font('assets/fonts/gamecamper.ttf', 36)
 font = pygame.font.Font('assets/fonts/gamecamper-lite.ttf', 24)
 
-# Load assets
+# Load backgrounds
 backgrounds = [pygame.image.load(
     f"assets/background{i}.png") for i in range(1, 3)]
+
+# Function to load GIF frames
+
+
+def load_gif_frames(path):
+    pil_img = Image.open(path)
+    frames = []
+    try:
+        while True:
+            frame = pil_img.convert("RGBA")
+            frames.append(pygame.image.fromstring(
+                frame.tobytes(), frame.size, "RGBA"))
+            pil_img.seek(len(frames))
+    except EOFError:
+        pass
+    return frames
+
+
+# Load fruit images as frame sequences
 fruit_images = {
-    "apple": pygame.image.load("assets/fruits/apple.png"),
-    "banana": pygame.image.load("assets/fruits/banana.png"),
-    "bomb": pygame.image.load("assets/fruits/bomb.png"),
-    "melon": pygame.image.load("assets/fruits/melon.png"),
-    "orange": pygame.image.load("assets/fruits/orange.png"),
+    "apple": load_gif_frames("assets/fruits/apple.gif"),
+    "banana": load_gif_frames("assets/fruits/banana.gif"),
+    "bomb": load_gif_frames("assets/fruits/bomb.gif"),
+    "melon": load_gif_frames("assets/fruits/melon.gif"),
+    "orange": load_gif_frames("assets/fruits/orange.gif"),
 }
 
-# Placeholder for sliced GIFs
-gif_frames = {"apple": [], "banana": [],
-              "bomb": [], "melon": [], "orange": [], }
-
-# Classes
+# Load explosion GIF
+kaboom_frames = load_gif_frames("assets/kaboom.gif")
 
 
 class Fruit:
     def __init__(self, fruit_type, x, y, trajectory):
         self.type = fruit_type
-        self.image = fruit_images[fruit_type]
+        self.frames = fruit_images[fruit_type]
+        self.frame_index = 0
+        self.image = self.frames[self.frame_index]
         self.x = x
         self.y = y
-        self.trajectory = trajectory  # A tuple (x_speed, y_speed)
+        self.trajectory = trajectory
         self.hitbox = self.image.get_rect(topleft=(self.x, self.y))
         self.sliced = False
+        self.last_frame_time = pygame.time.get_ticks()
+        self.explosion_frames = kaboom_frames
+        self.explosion_index = 0
+        self.exploding = False
 
     def move(self):
-        self.x += self.trajectory[0]
-        self.y += self.trajectory[1]
-        self.hitbox.topleft = (self.x, self.y)
+        if not self.exploding:
+            self.x += self.trajectory[0]
+            self.y += self.trajectory[1]
+            self.hitbox.topleft = (self.x, self.y)
+
+            if pygame.time.get_ticks() - self.last_frame_time > 50:
+                self.frame_index = (self.frame_index + 1) % len(self.frames)
+                self.image = self.frames[self.frame_index]
+                self.last_frame_time = pygame.time.get_ticks()
+        elif self.explosion_frames:
+            if pygame.time.get_ticks() - self.last_frame_time > 50:
+                if self.explosion_index < len(self.explosion_frames) - 1:
+                    self.explosion_index += 1
+                    self.image = self.explosion_frames[self.explosion_index]
+                    self.last_frame_time = pygame.time.get_ticks()
+                else:
+                    return False  # Mark for removal
+        return True
 
     def draw(self, surface):
-        if not self.sliced:
-            surface.blit(self.image, (self.x, self.y))
+        surface.blit(self.image, (self.x, self.y))
 
     def slice(self):
         self.sliced = True
-        # Play GIF (placeholder for now)
+        self.exploding = True
+        self.image = self.explosion_frames[0]
+        self.explosion_index = 0
+        self.last_frame_time = pygame.time.get_ticks()
 
 
 class Game:
@@ -97,24 +136,24 @@ class Game:
 
     def handle_slicing(self):
         mouse_pos = pygame.mouse.get_pos()
-        for fruit in self.fruits:
+        for fruit in self.fruits[:]:
             if fruit.hitbox.collidepoint(mouse_pos) and not fruit.sliced:
                 fruit.slice()
                 if fruit.type == "bomb":
                     self.lives -= 1
-                    # Play bomb effect
                 else:
                     self.score += 10 if fruit.type == "apple" else 20
                 if self.score > self.highscore:
                     self.highscore = self.score
 
     def update(self):
-        if random.randint(1, 50) == 1:  # Spawn fruit occasionally
+        if random.randint(1, 50) == 1:
             self.spawn_fruit()
 
-        for fruit in self.fruits:
-            fruit.move()
-            if fruit.y > SCREEN_HEIGHT and not fruit.sliced:
+        self.fruits = [fruit for fruit in self.fruits if fruit.move()]
+
+        for fruit in self.fruits[:]:
+            if fruit.y > SCREEN_HEIGHT and not fruit.exploding:
                 if fruit.type != "bomb":
                     self.lives -= 1
                 self.fruits.remove(fruit)
@@ -127,8 +166,7 @@ class Game:
         for fruit in self.fruits:
             fruit.draw(screen)
         score_text = big_font.render(f"{self.score}", True, YELLOW)
-        highscore_text = font.render(
-            f"Best: {self.highscore}", True, YELLOW)
+        highscore_text = font.render(f"Best: {self.highscore}", True, YELLOW)
         lives_text = font.render(f"Lives: {self.lives}", True, YELLOW)
         screen.blit(icon, (20, 20))
         screen.blit(score_text, (120, 20))
