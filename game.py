@@ -72,10 +72,14 @@ class Button:
         self.delay = 0.2
 
         text_surf = font.render(self.text, True, self.text_color)
-        self.width = text_surf.get_width() + padding[0] * 2
-        self.height = text_surf.get_height() + padding[1] * 2
-        self.x = x
-        self.y = y
+        self.text_width = text_surf.get_width()
+        self.text_height = text_surf.get_height()
+
+        self.width = self.text_width + padding[0] * 2
+        self.height = self.text_height + padding[1] * 2
+
+        self.x = x - self.width // 2
+        self.y = y - self.height // 2
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
         
     def draw(self, screen):
@@ -84,9 +88,11 @@ class Button:
         
         current_color = self.hover_color if self.rect.collidepoint(mouse_pos) else self.color
         pygame.draw.rect(screen, current_color, self.rect)
+
         text_surf = font.render(self.text, True, self.text_color)
-        screen.blit(text_surf, (self.x + (self.width - text_surf.get_width()) // 2, 
-                                self.y + (self.height - text_surf.get_height()) // 2))
+        text_x = self.rect.centerx - self.text_width // 2
+        text_y = self.rect.centery - self.text_height // 2
+        screen.blit(text_surf, (text_x, text_y))
         
         if self.rect.collidepoint(mouse_pos) and not click and self.last_pressed and self.action:
             current_time = time.time()
@@ -154,10 +160,16 @@ class Game:
         self.highscore = self.load_highscore()
         self.create_buttons()
 
+        self.life_images = [
+            pygame.image.load(f"assets/lives/lives_{i}.png").convert_alpha() for i in range(4)
+        ]
+
+        self.update_positions()
+
     def create_buttons(self):
         self.buttons = [
             Button("Start Game", BLACK, 540, 300, YELLOW, WHITE, self.start_game),
-            Button("Settings", BLACK, 540, 400, YELLOW, WHITE, self.settings),
+            Button("Quit", BLACK, 540, 400, YELLOW, WHITE, self.quit_game),
         ]
 
         self.map_buttons = [
@@ -168,7 +180,6 @@ class Game:
 
         self.game_over_buttons = [
             Button("Restart", BLACK, 540, 300, YELLOW, WHITE, self.start_game),
-            Button("Main Menu", BLACK, 540, 400, YELLOW, WHITE, self.to_main_menu),
             Button("Quit", BLACK, 540, 500, YELLOW, WHITE, self.quit_game),
         ]
 
@@ -236,6 +247,16 @@ class Game:
         if self.lives <= 0:
             self.state = STATE_GAME_OVER
 
+    def update_positions(self):
+        self.icon_x = SCREEN_WIDTH * 0.02
+        self.icon_y = SCREEN_HEIGHT * 0.04
+        self.score_x = SCREEN_WIDTH * 0.1
+        self.score_y = SCREEN_HEIGHT * 0.04
+        self.highscore_x = SCREEN_WIDTH * 0.02
+        self.highscore_y = SCREEN_HEIGHT * 0.16
+        self.life_x = SCREEN_WIDTH - self.life_images[self.lives].get_width() - SCREEN_WIDTH * 0.02
+        self.life_y = SCREEN_HEIGHT * 0.04
+
     def draw(self):
         if self.state == STATE_MENU:
             self.draw_menu()
@@ -245,38 +266,69 @@ class Game:
             screen.blit(backgrounds[self.selected_map], (0, 0))
             for fruit in self.fruits:
                 fruit.draw(screen)
+
             score_text = big_font.render(f"{self.score}", True, YELLOW)
             highscore_text = font.render(f"Best: {self.highscore}", True, YELLOW)
-            lives_text = font.render(f"Lives: {self.lives}", True, YELLOW)
-            screen.blit(icon, (20, 20))
-            screen.blit(score_text, (120, 20))
-            screen.blit(highscore_text, (20, 110))
-            screen.blit(lives_text, (20, 160))
+
+            screen.blit(icon, (self.icon_x, self.icon_y))
+            screen.blit(score_text, (self.score_x, self.score_y))
+            screen.blit(highscore_text, (self.highscore_x, self.highscore_y))
+
+            life_image = self.life_images[self.lives]
+            screen.blit(life_image, (self.life_x, self.life_y))
+
         elif self.state == STATE_GAME_OVER:
             self.draw_game_over()
 
     def draw_menu(self):
         screen.fill(BLACK)
+        
         title = big_font.render("Fruit Ninja", True, YELLOW)
-        screen.blit(title, (540, 200))
+        title_x = (SCREEN_WIDTH - title.get_width()) // 2
+        screen.blit(title, (title_x, 150))
+        
+        button_y = 300
         for button in self.buttons:
+            button_x = (SCREEN_WIDTH - button.width) // 2
+            button.rect.x = button_x
+            button.rect.y = button_y
             button.draw(screen)
+            button_y += 100
 
     def draw_map_selection(self):
         screen.fill(BLACK)
+        
         title = big_font.render("Pick a Map", True, YELLOW)
-        screen.blit(title, (540, 200))
+        title_x = (SCREEN_WIDTH - title.get_width()) // 2
+        screen.blit(title, (title_x, 150))
+        
+        button_y = 300
         for button in self.map_buttons:
+            button_x = (SCREEN_WIDTH - button.width) // 2
+            button.rect.x = button_x
+            button.rect.y = button_y
             button.draw(screen)
+            button_y += 100
 
     def draw_game_over(self):
         screen.fill(BLACK)
+        
         score_text = big_font.render(f"Score: {self.score}", True, YELLOW)
+        score_x = (SCREEN_WIDTH - score_text.get_width()) // 2
+        screen.blit(score_text, (score_x, 150))
+        
         highscore_text = font.render(f"Highscore: {self.highscore}", True, YELLOW)
-        screen.blit(score_text, (540, 200))
-        screen.blit(highscore_text, (540, 250))
+        highscore_x = (SCREEN_WIDTH - highscore_text.get_width()) // 2
+        screen.blit(highscore_text, (highscore_x, 230))
+        
+        button_y = 300
         for button in self.game_over_buttons:
+            button_x = (SCREEN_WIDTH - button.width) // 2
+            button.rect.x = button_x
+            button.rect.y = button_y
             button.draw(screen)
+            button_y += 100
+
 
     def run(self):
         while self.running:
@@ -287,7 +339,10 @@ class Game:
                     self.mouse_held = True
                 elif event.type == pygame.MOUSEBUTTONUP:
                     self.mouse_held = False
-                
+                elif event.type == pygame.VIDEORESIZE:
+                    SCREEN_WIDTH, SCREEN_HEIGHT = event.w, event.h
+                    screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.RESIZABLE)
+                    self.update_positions()
 
             if self.state == STATE_MENU:
                 self.draw_menu()
