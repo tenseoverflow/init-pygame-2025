@@ -2,6 +2,7 @@ import pygame
 import random
 from PIL import Image
 import time
+import os
 
 # Initialize Pygame
 pygame.init()
@@ -15,7 +16,7 @@ icon = pygame.image.load("assets/icon.png").convert_alpha()
 pygame.display.set_icon(icon)
 
 # Colors
-YELLOW = (253, 231, 56)
+PRIMARY = (253, 231, 56)
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 
@@ -24,7 +25,22 @@ clock = pygame.time.Clock()
 big_font = pygame.font.Font('assets/fonts/gamecamper.ttf', 36)
 font = pygame.font.Font('assets/fonts/gamecamper-lite.ttf', 24)
 
-# Load fruit images as frame sequences
+def load_fruit_images(directory):
+    fruit_images = {}
+    for filename in os.listdir(directory):
+        file_path = os.path.join(directory, filename)
+        
+        if filename.endswith(".gif"):
+            fruit_name = os.path.splitext(filename)[0]  # Get the name without extension
+            fruit_images[fruit_name] = load_gif_frames(file_path)  # Load as GIF
+        elif filename.endswith((".png", ".jpg", ".jpeg")):
+            fruit_name = os.path.splitext(filename)[0]  # Get the name without extension
+            image = pygame.image.load(file_path).convert_alpha()  # Load static image
+            # Resize the image to be at most 120x120 while keeping the aspect ratio
+            fruit_images[fruit_name] = [resize_image(image)]  # Store resized image
+    return fruit_images
+
+# Load fruit images as frame sequences for GIFs
 def load_gif_frames(path):
     pil_img = Image.open(path)
     frames = []
@@ -37,19 +53,37 @@ def load_gif_frames(path):
         pass
     return frames
 
-fruit_images = {
-    "apple": load_gif_frames("assets/fruits/apple.gif"),
-    "banana": load_gif_frames("assets/fruits/banana.gif"),
-    "bomb": load_gif_frames("assets/fruits/bomb.gif"),
-    "melon": load_gif_frames("assets/fruits/melon.gif"),
-    "orange": load_gif_frames("assets/fruits/orange.gif"),
-}
+# Load background images dynamically
+def load_background_images(directory):
+    backgrounds = {}
+    for filename in os.listdir(directory):
+        if filename.endswith(".png"):
+            background_name = os.path.splitext(filename)[0]  # Get the name without extension
+            backgrounds[background_name] = pygame.image.load(os.path.join(directory, filename))
+    return backgrounds
+
+# Resize an image to be at most 120x120, keeping the aspect ratio
+def resize_image(image, max_size=120):
+    width, height = image.get_size()
+    
+    # Calculate the scaling factor
+    if width > height:
+        new_width = min(width, max_size)
+        new_height = int((new_width / width) * height)
+    else:
+        new_height = min(height, max_size)
+        new_width = int((new_height / height) * width)
+
+    # Perform the resizing
+    return pygame.transform.scale(image, (new_width, new_height))
+
+
+# Load fruit and kaboom images
+fruit_images = load_fruit_images("assets/fruits")
 kaboom_frames = load_gif_frames("assets/kaboom.gif")
 
-# Load backgrounds
-backgrounds = {"Dojo": pygame.image.load("assets/background_dojo.png"),
-               "Peace": pygame.image.load("assets/background_peace.png"),
-               "Basic": pygame.image.load("assets/background_basic.png")}
+# Load background images
+backgrounds = load_background_images("assets/backgrounds")
 
 # Game States
 STATE_MENU = "menu"
@@ -57,9 +91,7 @@ STATE_MAP_SELECTION = "map_selection"
 STATE_PLAYING = "playing"
 STATE_GAME_OVER = "game_over"
 
-
 GRAVITY = 0.3
-
 
 class Button:
     def __init__(self, text, text_color, x, y, color, hover_color, action=None, padding=(20, 10)):
@@ -168,20 +200,24 @@ class Game:
 
     def create_buttons(self):
         self.buttons = [
-            Button("Start Game", BLACK, 540, 300, YELLOW, WHITE, self.start_game),
-            Button("Quit", BLACK, 540, 400, YELLOW, WHITE, self.quit_game),
+            Button("Start Game", BLACK, 540, 300, PRIMARY, WHITE, self.start_game),
+            Button("Quit", BLACK, 540, 400, PRIMARY, WHITE, self.quit_game),
         ]
 
-        self.map_buttons = [
-            Button("Dojo", BLACK, 400, 300, YELLOW, WHITE, lambda: self.select_map("Dojo")),
-            Button("Peace", BLACK, 640, 300, YELLOW, WHITE, lambda: self.select_map("Peace")),
-            Button("Basic", BLACK, 880, 300, YELLOW, WHITE, lambda: self.select_map("Basic")),
-        ]
+        self.map_buttons = []
+        map_x = 400
+        map_y = 300
+        button_padding = 140
+
+        for i, map_name in enumerate(backgrounds.keys()):
+            button = Button(map_name, BLACK, map_x + i * button_padding, map_y, PRIMARY, WHITE, lambda map_name=map_name: self.select_map(map_name))
+            self.map_buttons.append(button)
 
         self.game_over_buttons = [
-            Button("Restart", BLACK, 540, 300, YELLOW, WHITE, self.start_game),
-            Button("Quit", BLACK, 540, 500, YELLOW, WHITE, self.quit_game),
+            Button("Restart", BLACK, 540, 300, PRIMARY, WHITE, self.start_game),
+            Button("Quit", BLACK, 540, 500, PRIMARY, WHITE, self.quit_game),
         ]
+
 
     def start_game(self):
         self.state = STATE_MAP_SELECTION
@@ -194,9 +230,6 @@ class Game:
     def to_main_menu(self):
         self.state = STATE_MENU
         self.create_buttons()
-
-    def settings(self):
-        pass  # Placeholder for settings functionality
 
     def quit_game(self):
         pygame.quit()
@@ -226,11 +259,13 @@ class Game:
             if fruit.hitbox.collidepoint(mouse_pos) and not fruit.sliced:
                 fruit.slice()
                 if fruit.type == "bomb":
-                    self.lives -= 1
+                    self.lives = 0
+                    self.state = STATE_GAME_OVER
                 else:
                     self.score += 10 if fruit.type == "apple" else 20
                 if self.score > self.highscore:
                     self.highscore = self.score
+
 
     def update(self):
         if random.randint(1, 50) == 1:
@@ -267,8 +302,8 @@ class Game:
             for fruit in self.fruits:
                 fruit.draw(screen)
 
-            score_text = big_font.render(f"{self.score}", True, YELLOW)
-            highscore_text = font.render(f"Best: {self.highscore}", True, YELLOW)
+            score_text = big_font.render(f"{self.score}", True, PRIMARY)
+            highscore_text = font.render(f"Best: {self.highscore}", True, PRIMARY)
 
             screen.blit(icon, (self.icon_x, self.icon_y))
             screen.blit(score_text, (self.score_x, self.score_y))
@@ -283,7 +318,7 @@ class Game:
     def draw_menu(self):
         screen.fill(BLACK)
         
-        title = big_font.render("Fruit Ninja", True, YELLOW)
+        title = big_font.render("Fruit Ninja", True, PRIMARY)
         title_x = (SCREEN_WIDTH - title.get_width()) // 2
         screen.blit(title, (title_x, 150))
         
@@ -298,7 +333,7 @@ class Game:
     def draw_map_selection(self):
         screen.fill(BLACK)
         
-        title = big_font.render("Pick a Map", True, YELLOW)
+        title = big_font.render("Pick a Map", True, PRIMARY)
         title_x = (SCREEN_WIDTH - title.get_width()) // 2
         screen.blit(title, (title_x, 150))
         
@@ -313,11 +348,11 @@ class Game:
     def draw_game_over(self):
         screen.fill(BLACK)
         
-        score_text = big_font.render(f"Score: {self.score}", True, YELLOW)
+        score_text = big_font.render(f"Score: {self.score}", True, PRIMARY)
         score_x = (SCREEN_WIDTH - score_text.get_width()) // 2
         screen.blit(score_text, (score_x, 150))
         
-        highscore_text = font.render(f"Highscore: {self.highscore}", True, YELLOW)
+        highscore_text = font.render(f"Highscore: {self.highscore}", True, PRIMARY)
         highscore_x = (SCREEN_WIDTH - highscore_text.get_width()) // 2
         screen.blit(highscore_text, (highscore_x, 230))
         
