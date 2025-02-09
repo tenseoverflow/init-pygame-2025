@@ -1,7 +1,7 @@
 import pygame
 import random
 from PIL import Image
-import os
+import time
 
 # Initialize Pygame
 pygame.init()
@@ -9,7 +9,7 @@ pygame.init()
 # Screen settings
 SCREEN_WIDTH = 1280
 SCREEN_HEIGHT = 720
-screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.RESIZABLE)
+screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("Fruit Ninja")
 icon = pygame.image.load("assets/icon.png").convert_alpha()
 pygame.display.set_icon(icon)
@@ -57,27 +57,43 @@ STATE_MAP_SELECTION = "map_selection"
 STATE_PLAYING = "playing"
 STATE_GAME_OVER = "game_over"
 
+
+GRAVITY = 0.3
+
+
 class Button:
-    def __init__(self, text, x, y, width, height, color, hover_color, font, action=None):
+    def __init__(self, text, text_color, x, y, color, hover_color, action=None, padding=(20, 10)):
         self.text = text
-        self.rect = pygame.Rect(x, y, width, height)
+        self.text_color = text_color
         self.color = color
         self.hover_color = hover_color
-        self.font = font
-        self.action = action  # Function to call when clicked
+        self.action = action
+        self.last_pressed = False
+        self.delay = 0.2
 
+        text_surf = font.render(self.text, True, self.text_color)
+        self.width = text_surf.get_width() + padding[0] * 2
+        self.height = text_surf.get_height() + padding[1] * 2
+        self.x = x
+        self.y = y
+        self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
+        
     def draw(self, screen):
         mouse_pos = pygame.mouse.get_pos()
-        color = self.hover_color if self.rect.collidepoint(mouse_pos) else self.color
-        pygame.draw.rect(screen, color, self.rect, border_radius=10)
-        text_surf = self.font.render(self.text, True, BLACK)
-        text_rect = text_surf.get_rect(center=self.rect.center)
-        screen.blit(text_surf, text_rect)
-
-    def check_click(self, event):
-        if event.type == pygame.MOUSEBUTTONDOWN and self.rect.collidepoint(event.pos):
-            if self.action:
+        click = pygame.mouse.get_pressed()[0]
+        
+        current_color = self.hover_color if self.rect.collidepoint(mouse_pos) else self.color
+        pygame.draw.rect(screen, current_color, self.rect)
+        text_surf = font.render(self.text, True, self.text_color)
+        screen.blit(text_surf, (self.x + (self.width - text_surf.get_width()) // 2, 
+                                self.y + (self.height - text_surf.get_height()) // 2))
+        
+        if self.rect.collidepoint(mouse_pos) and not click and self.last_pressed and self.action:
+            current_time = time.time()
+            if current_time - self.last_pressed > self.delay:
                 self.action()
+                self.last_pressed = current_time
+        self.last_pressed = click
 
 class Fruit:
     def __init__(self, fruit_type, x, y, trajectory):
@@ -99,6 +115,7 @@ class Fruit:
         if not self.exploding:
             self.x += self.trajectory[0]
             self.y += self.trajectory[1]
+            self.trajectory = (self.trajectory[0], self.trajectory[1] + GRAVITY)
             self.hitbox.topleft = (self.x, self.y)
 
             if pygame.time.get_ticks() - self.last_frame_time > 50:
@@ -139,20 +156,20 @@ class Game:
 
     def create_buttons(self):
         self.buttons = [
-            Button("Start Game", 540, 300, 200, 50, YELLOW, WHITE, font, self.start_game),
-            Button("Settings", 540, 400, 200, 50, YELLOW, WHITE, font, self.settings),
+            Button("Start Game", BLACK, 540, 300, YELLOW, WHITE, self.start_game),
+            Button("Settings", BLACK, 540, 400, YELLOW, WHITE, self.settings),
         ]
 
         self.map_buttons = [
-            Button("Dojo", 400, 300, 200, 50, YELLOW, WHITE, font, lambda: self.select_map("Dojo")),
-            Button("Peace", 640, 300, 200, 50, YELLOW, WHITE, font, lambda: self.select_map("Peace")),
-            Button("Basic", 880, 300, 200, 50, YELLOW, WHITE, font, lambda: self.select_map("Basic")),
+            Button("Dojo", BLACK, 400, 300, YELLOW, WHITE, lambda: self.select_map("Dojo")),
+            Button("Peace", BLACK, 640, 300, YELLOW, WHITE, lambda: self.select_map("Peace")),
+            Button("Basic", BLACK, 880, 300, YELLOW, WHITE, lambda: self.select_map("Basic")),
         ]
 
         self.game_over_buttons = [
-            Button("Restart", 540, 300, 200, 50, YELLOW, WHITE, font, self.start_game),
-            Button("Main Menu", 540, 400, 200, 50, YELLOW, WHITE, font, self.to_main_menu),
-            Button("Quit", 540, 500, 200, 50, YELLOW, WHITE, font, self.quit_game),
+            Button("Restart", BLACK, 540, 300, YELLOW, WHITE, self.start_game),
+            Button("Main Menu", BLACK, 540, 400, YELLOW, WHITE, self.to_main_menu),
+            Button("Quit", BLACK, 540, 500, YELLOW, WHITE, self.quit_game),
         ]
 
     def start_game(self):
@@ -178,7 +195,7 @@ class Game:
         fruit_type = random.choice(list(fruit_images.keys()))
         x = random.randint(50, SCREEN_WIDTH - 50)
         y = SCREEN_HEIGHT
-        trajectory = (random.choice([-2, 2]), random.randint(-8, -5))
+        trajectory = (random.choice([-2, 2]), random.randint(-20, -18))
         self.fruits.append(Fruit(fruit_type, x, y, trajectory))
 
     def load_highscore(self):
@@ -268,15 +285,6 @@ class Game:
                     self.running = False
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     self.mouse_held = True
-                    if self.state == STATE_MENU:
-                        for button in self.buttons:
-                            button.check_click(event)
-                    elif self.state == STATE_MAP_SELECTION:
-                        for button in self.map_buttons:
-                            button.check_click(event)
-                    elif self.state == STATE_GAME_OVER:
-                        for button in self.game_over_buttons:
-                            button.check_click(event)
                 elif event.type == pygame.MOUSEBUTTONUP:
                     self.mouse_held = False
                 
