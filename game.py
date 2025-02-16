@@ -91,7 +91,7 @@ def resize_image(image, max_size=120):
 
 # Load fruit and kaboom images
 fruit_images = load_fruit_images("assets/fruits")
-kaboom_frames = load_gif_frames("assets/kaboom.gif")
+slice_frames = load_gif_frames("assets/effects/slice.gif")
 
 # Load background images
 backgrounds = load_background_images("assets/backgrounds")
@@ -163,7 +163,7 @@ class Fruit:
         self.hitbox = self.image.get_rect(topleft=(self.x, self.y))
         self.sliced = False
         self.last_frame_time = pygame.time.get_ticks()
-        self.explosion_frames = kaboom_frames
+        self.slice_frames = slice_frames
         self.explosion_index = 0
         self.exploding = False
 
@@ -179,11 +179,11 @@ class Fruit:
                 self.frame_index = (self.frame_index + 1) % len(self.frames)
                 self.image = self.frames[self.frame_index]
                 self.last_frame_time = pygame.time.get_ticks()
-        elif self.explosion_frames:
+        elif self.slice_frames:
             if pygame.time.get_ticks() - self.last_frame_time > 50:
-                if self.explosion_index < len(self.explosion_frames) - 1:
+                if self.explosion_index < len(self.slice_frames) - 1:
                     self.explosion_index += 1
-                    self.image = self.explosion_frames[self.explosion_index]
+                    self.image = self.slice_frames[self.explosion_index]
                     self.last_frame_time = pygame.time.get_ticks()
                 else:
                     return False  # Mark for removal
@@ -194,13 +194,12 @@ class Fruit:
         new_rect = rotated_image.get_rect(center = self.image.get_rect(topleft = (self.x, self.y)).center)
 
         surface.blit(rotated_image, new_rect)
-        # surface.blit(self.image, (self.x, self.y))
 
     def slice(self):
         self.angle = 0
         self.sliced = True
         self.exploding = True
-        self.image = self.explosion_frames[0]
+        self.image = self.slice_frames[0]
         self.explosion_index = 0
         self.last_frame_time = pygame.time.get_ticks()
 
@@ -215,6 +214,9 @@ class Game:
         self.mouse_held = False
         self.highscore = self.load_highscore()
         self.create_buttons()
+
+        pygame.mixer.stop()
+        sounds["soundtrack"].play(-1)
 
         self.life_images = [
             pygame.image.load(f"assets/lives/lives_{i}.png").convert_alpha() for i in range(4)
@@ -239,9 +241,8 @@ class Game:
 
         self.game_over_buttons = [
             Button("Retry", BLACK, 540, 300, PRIMARY, WHITE, self.restart_game),
-            Button("Quit", BLACK, 540, 500, PRIMARY, WHITE, self.quit_game),
+            Button("Back", BLACK, 540, 500, PRIMARY, WHITE, self.to_main_menu),
         ]
-
 
     def start_game(self):
         self.state = STATE_MAP_SELECTION
@@ -249,9 +250,13 @@ class Game:
     def select_map(self, map_name):
         self.selected_map = map_name
         self.background = backgrounds[self.selected_map]
+        pygame.mixer.stop()
+        sounds["ambience_flute"].play(-1)
         self.state = STATE_PLAYING
 
     def to_main_menu(self):
+        pygame.mixer.stop()
+        sounds["soundtrack"].play(-1)
         self.state = STATE_MENU
         self.create_buttons()
 
@@ -271,6 +276,10 @@ class Game:
         y = SCREEN_HEIGHT
         trajectory = (random.choice([-2, 2]), random.randint(-20, -18))
         self.fruits.append(Fruit(fruit_type, x, y, trajectory))
+        if fruit_type != "bomb":
+            sounds["throw"].play()
+        else:
+            sounds["bomb_throw"].play()
 
     def load_highscore(self):
         try:
@@ -288,11 +297,12 @@ class Game:
         for fruit in self.fruits[:]:
             if fruit.hitbox.collidepoint(mouse_pos) and not fruit.sliced:
                 fruit.slice()
-                sounds["kaboom"].play()
                 if fruit.type == "bomb":
+                    sounds["kaboom"].play()
                     self.lives = 0
                     self.state = STATE_GAME_OVER
                 else:
+                    sounds["slice"].play()
                     self.score += 10 if fruit.type == "apple" else 20
                 if self.score > self.highscore:
                     self.highscore = self.score
@@ -308,6 +318,7 @@ class Game:
             if fruit.y > SCREEN_HEIGHT and not fruit.exploding:
                 if fruit.type != "bomb":
                     self.lives -= 1
+                    sounds["miss"].play()
                 self.fruits.remove(fruit)
 
         if self.lives <= 0:
@@ -334,23 +345,25 @@ class Game:
                 fruit.draw(screen)
 
             score_text = big_font.render(f"{self.score}", True, PRIMARY)
-            highscore_text = font.render(f"Best: {self.highscore}", True, PRIMARY)
-
             screen.blit(icon, (self.icon_x, self.icon_y))
             screen.blit(score_text, (self.score_x, self.score_y))
-            screen.blit(highscore_text, (self.highscore_x, self.highscore_y))
+
+            if self.load_highscore() > 0:
+                highscore_text = font.render(f"BEST: {self.highscore}", True, PRIMARY)
+                screen.blit(highscore_text, (self.highscore_x, self.highscore_y))
 
             life_image = self.life_images[self.lives]
             screen.blit(life_image, (self.life_x, self.life_y))
 
         elif self.state == STATE_GAME_OVER:
             self.draw_game_over()
+            self.save_highscore()
 
     def draw_menu(self):
         screen.blit(backgrounds[self.selected_map], (0, 0))
         screen.blit(game_over_overlay, (0, 0))
         
-        title = big_font.render("Fruit Ninja", True, PRIMARY)
+        title = big_font.render("FRUIT NINJA", True, PRIMARY)
         title_x = (SCREEN_WIDTH - title.get_width()) // 2
         screen.blit(title, (title_x, 150))
         
@@ -366,7 +379,7 @@ class Game:
         screen.blit(backgrounds[self.selected_map], (0, 0))
         screen.blit(game_over_overlay, (0, 0))
         
-        title = big_font.render("Pick a Map", True, PRIMARY)
+        title = big_font.render("PICK A MAP", True, PRIMARY)
         title_x = (SCREEN_WIDTH - title.get_width()) // 2
         screen.blit(title, (title_x, 150))
         
@@ -382,11 +395,11 @@ class Game:
         screen.blit(backgrounds[self.selected_map], (0, 0))
         screen.blit(game_over_overlay, (0, 0))
         
-        score_text = big_font.render(f"Score: {self.score}", True, PRIMARY)
+        score_text = big_font.render(f"SCORE: {self.score}", True, PRIMARY)
         score_x = (SCREEN_WIDTH - score_text.get_width()) // 2
         screen.blit(score_text, (score_x, 150))
         
-        highscore_text = font.render(f"Highscore: {self.highscore}", True, PRIMARY)
+        highscore_text = font.render(f"HIGHSCORE: {self.highscore}", True, PRIMARY)
         highscore_x = (SCREEN_WIDTH - highscore_text.get_width()) // 2
         screen.blit(highscore_text, (highscore_x, 230))
 
