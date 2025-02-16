@@ -312,7 +312,8 @@ class Game:
 
 
     def update(self):
-        if random.randint(1, 50) == 1:
+        difficulty = int(round(69 - (self.score / 5)))
+        if (difficulty) != 0 and random.randint(1, difficulty) == 1:
             self.spawn_fruit()
 
         self.fruits = [fruit for fruit in self.fruits if fruit.move()]
