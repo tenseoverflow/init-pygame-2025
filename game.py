@@ -306,7 +306,7 @@ class Game:
                     self.state = STATE_GAME_OVER
                 else:
                     sounds["slice"].play()
-                    self.score += 10 if fruit.type == "apple" else 20
+                    self.score += 1
                 if self.score > self.highscore:
                     self.highscore = self.score
 
