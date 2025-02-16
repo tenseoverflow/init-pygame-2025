@@ -257,6 +257,9 @@ class Game:
     def to_main_menu(self):
         pygame.mixer.stop()
         sounds["soundtrack"].play(-1)
+        self.fruits = []
+        self.score = 0
+        self.lives = 3
         self.state = STATE_MENU
         self.create_buttons()
 
