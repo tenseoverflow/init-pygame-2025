@@ -1,207 +1,29 @@
 import pygame
 import random
-from PIL import Image
 import time
 import os
 
 # Initialize Pygame
 pygame.init()
+pygame.mixer.init()
+from game_screen import screen
+from resources import *
+from constants import *
+from button import *
+from fruit import *
 
 # Screen settings
-SCREEN_WIDTH = 1280
-SCREEN_HEIGHT = 720
-screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("Fruit Ninja")
 icon = pygame.image.load("assets/icon.png").convert_alpha()
 pygame.display.set_icon(icon)
 
-# Colors
-PRIMARY = (253, 231, 56)
-WHITE = (255, 255, 255)
-BLACK = (0, 0, 0)
-
-# Clock and font
+# Clock
 clock = pygame.time.Clock()
-big_font = pygame.font.Font('assets/fonts/gamecamper.ttf', 36)
-font = pygame.font.Font('assets/fonts/gamecamper-lite.ttf', 24)
 
-def load_fruit_images(directory):
-    fruit_images = {}
-    for filename in os.listdir(directory):
-        file_path = os.path.join(directory, filename)
-        
-        if filename.endswith(".gif"):
-            fruit_name = os.path.splitext(filename)[0]  # Get the name without extension
-            fruit_images[fruit_name] = load_gif_frames(file_path)  # Load as GIF
-        elif filename.lower().endswith((".png", ".jpg", ".jpeg")):
-            fruit_name = os.path.splitext(filename)[0]  # Get the name without extension
-            image = pygame.image.load(file_path).convert_alpha()  # Load static image
-            # Resize the image to be at most 120x120 while keeping the aspect ratio
-            fruit_images[fruit_name] = [resize_image(image)]  # Store resized image
-    return fruit_images
-
-# Load fruit images as frame sequences for GIFs
-def load_gif_frames(path):
-    pil_img = Image.open(path)
-    frames = []
-    try:
-        while True:
-            frame = pil_img.convert("RGBA")
-            frames.append(pygame.image.fromstring(frame.tobytes(), frame.size, "RGBA"))
-            pil_img.seek(len(frames))
-    except EOFError:
-        pass
-    return frames
-
-# Load background images dynamically
-def load_background_images(directory):
-    backgrounds = {}
-    for filename in os.listdir(directory):
-        if filename.lower().endswith((".png", ".jpg", ".jpeg")):
-            background_name = os.path.splitext(filename)[0]  # Get the name without extension
-            backgrounds[background_name] = pygame.image.load(os.path.join(directory, filename))
-        else:
-            print(filename)
-    return backgrounds
-
-# Load sounds dynamically
-def load_sounds(directory):
-    sounds = {}
-    for filename in os.listdir(directory):
-        if filename.lower().endswith((".mp3", ".wav", ".m4a")):
-            sound_name = os.path.splitext(filename)[0]  # Get the name without extension
-            sounds[sound_name] = pygame.mixer.Sound(os.path.join(directory, filename))
-    return sounds
-
-# Resize an image to be at most 120x120, keeping the aspect ratio
-def resize_image(image, max_size=120):
-    width, height = image.get_size()
-    
-    # Calculate the scaling factor
-    if width > height:
-        new_width = min(width, max_size)
-        new_height = int((new_width / width) * height)
-    else:
-        new_height = min(height, max_size)
-        new_width = int((new_height / height) * width)
-
-    # Perform the resizing
-    return pygame.transform.scale(image, (new_width, new_height))
-
-
-# Load fruit and kaboom images
-fruit_images = load_fruit_images("assets/fruits")
-slice_frames = load_gif_frames("assets/effects/slice.gif")
-
-# Load background images
-backgrounds = load_background_images("assets/backgrounds")
-
-sounds = load_sounds("assets/sounds")
-game_over_overlay = pygame.Surface( \
+game_over_overlay = pygame.Surface(
     (SCREEN_WIDTH, SCREEN_HEIGHT), pygame.SRCALPHA).convert_alpha()  # Creating a surface with supports transparency
 game_over_overlay.fill(pygame.Color(0, 0, 0, 127))
 
-# Game States
-STATE_MENU = "menu"
-STATE_MAP_SELECTION = "map_selection"
-STATE_PLAYING = "playing"
-STATE_GAME_OVER = "game_over"
-
-GRAVITY = 0.3
-
-class Button:
-    def __init__(self, text, text_color, x, y, color, hover_color, action=None, padding=(20, 10)):
-        self.text = text
-        self.text_color = text_color
-        self.color = color
-        self.hover_color = hover_color
-        self.action = action
-        self.last_pressed = False
-        self.delay = 0.2
-
-        text_surf = font.render(self.text, True, self.text_color)
-        self.text_width = text_surf.get_width()
-        self.text_height = text_surf.get_height()
-
-        self.width = self.text_width + padding[0] * 2
-        self.height = self.text_height + padding[1] * 2
-
-        self.x = x - self.width // 2
-        self.y = y - self.height // 2
-        self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
-        
-    def draw(self, screen):
-        mouse_pos = pygame.mouse.get_pos()
-        click = pygame.mouse.get_pressed()[0]
-        
-        current_color = self.hover_color if self.rect.collidepoint(mouse_pos) else self.color
-        pygame.draw.rect(screen, current_color, self.rect)
-
-        text_surf = font.render(self.text, True, self.text_color)
-        text_x = self.rect.centerx - self.text_width // 2
-        text_y = self.rect.centery - self.text_height // 2
-        screen.blit(text_surf, (text_x, text_y))
-        
-        if self.rect.collidepoint(mouse_pos) and not click and self.last_pressed and self.action:
-            current_time = time.time()
-            if current_time - self.last_pressed > self.delay:
-                self.action()
-                self.last_pressed = current_time
-        self.last_pressed = click
-
-class Fruit:
-    def __init__(self, fruit_type, x, y, trajectory):
-        self.type = fruit_type
-        self.frames = fruit_images[fruit_type]
-        self.frame_index = 0
-        self.image = self.frames[self.frame_index]
-        self.x = x
-        self.y = y
-        self.angle = 0
-        self.rotate_direction = random.choice(range(-25, 25))
-        self.trajectory = trajectory
-        self.hitbox = self.image.get_rect(topleft=(self.x, self.y))
-        self.sliced = False
-        self.last_frame_time = pygame.time.get_ticks()
-        self.slice_frames = slice_frames
-        self.explosion_index = 0
-        self.exploding = False
-
-    def move(self):
-        if not self.exploding:
-            self.angle += self.rotate_direction
-            self.x += self.trajectory[0]
-            self.y += self.trajectory[1]
-            self.trajectory = (self.trajectory[0], self.trajectory[1] + GRAVITY)
-            self.hitbox.topleft = (self.x, self.y)
-
-            if pygame.time.get_ticks() - self.last_frame_time > 50:
-                self.frame_index = (self.frame_index + 1) % len(self.frames)
-                self.image = self.frames[self.frame_index]
-                self.last_frame_time = pygame.time.get_ticks()
-        elif self.slice_frames:
-            if pygame.time.get_ticks() - self.last_frame_time > 50:
-                if self.explosion_index < len(self.slice_frames) - 1:
-                    self.explosion_index += 1
-                    self.image = self.slice_frames[self.explosion_index]
-                    self.last_frame_time = pygame.time.get_ticks()
-                else:
-                    return False  # Mark for removal
-        return True
-
-    def draw(self, surface):
-        rotated_image = pygame.transform.rotate(self.image, self.angle)
-        new_rect = rotated_image.get_rect(center = self.image.get_rect(topleft = (self.x, self.y)).center)
-
-        surface.blit(rotated_image, new_rect)
-
-    def slice(self):
-        self.angle = 0
-        self.sliced = True
-        self.exploding = True
-        self.image = self.slice_frames[0]
-        self.explosion_index = 0
-        self.last_frame_time = pygame.time.get_ticks()
 
 class Game:
     def __init__(self):
@@ -251,7 +73,8 @@ class Game:
         self.selected_map = map_name
         self.background = backgrounds[self.selected_map]
         pygame.mixer.stop()
-        sounds["ambience_flute"].play(-1)
+        sounds["flute"].play()
+        sounds["ambience"].play(-1)
         self.state = STATE_PLAYING
 
     def to_main_menu(self):
@@ -261,9 +84,10 @@ class Game:
         self.score = 0
         self.lives = 3
         self.state = STATE_MENU
-        self.create_buttons()
 
     def restart_game(self):
+        pygame.mixer.stop()
+        sounds["soundtrack"].play(-1)
         self.fruits = []
         self.score = 0
         self.lives = 3
@@ -279,10 +103,10 @@ class Game:
         y = SCREEN_HEIGHT
         trajectory = (random.choice([-2, 2]), random.randint(-20, -18))
         self.fruits.append(Fruit(fruit_type, x, y, trajectory))
-        if fruit_type != "bomb":
-            sounds["throw"].play()
-        else:
+        if fruit_type == "bomb":
             sounds["bomb_throw"].play()
+        else:
+            sounds["throw"].play()
 
     def load_highscore(self):
         try:
@@ -319,7 +143,7 @@ class Game:
         self.fruits = [fruit for fruit in self.fruits if fruit.move()]
 
         for fruit in self.fruits[:]:
-            if fruit.y > SCREEN_HEIGHT and not fruit.exploding:
+            if fruit.y > SCREEN_HEIGHT and not fruit.sliced:
                 if fruit.type != "bomb":
                     self.lives -= 1
                     sounds["miss"].play()
