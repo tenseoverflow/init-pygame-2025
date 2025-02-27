@@ -21,7 +21,7 @@ class Fruit:
         self.slice_frame_count = 0
 
     def move(self):
-        if not self.exploding:
+        if not self.sliced:
             self.angle += self.rotate_direction
             self.x += self.trajectory[0]
             self.y += self.trajectory[1]

@@ -80,18 +80,17 @@ class Game:
     def to_main_menu(self):
         pygame.mixer.stop()
         sounds["soundtrack"].play(-1)
-        self.fruits = []
         self.score = 0
         self.lives = 3
         self.state = STATE_MENU
 
     def restart_game(self):
         pygame.mixer.stop()
-        sounds["soundtrack"].play(-1)
-        self.fruits = []
+        sounds["flute"].play()
+        sounds["ambience"].play(-1)
         self.score = 0
         self.lives = 3
-        self.state = STATE_MAP_SELECTION
+        self.state = STATE_PLAYING
 
     def quit_game(self):
         pygame.quit()
@@ -121,13 +120,14 @@ class Game:
 
     def handle_slicing(self):
         mouse_pos = pygame.mouse.get_pos()
-        for fruit in self.fruits[:]:
+        for fruit in self.fruits.copy():
             if fruit.hitbox.collidepoint(mouse_pos) and not fruit.sliced:
                 fruit.slice()
                 if fruit.type == "bomb":
                     sounds["kaboom"].play()
                     self.lives = 0
                     self.state = STATE_GAME_OVER
+                    self.fruits.clear()
                 else:
                     sounds["slice"].play()
                     self.score += 1
@@ -142,7 +142,7 @@ class Game:
 
         self.fruits = [fruit for fruit in self.fruits if fruit.move()]
 
-        for fruit in self.fruits[:]:
+        for fruit in self.fruits.copy():
             if fruit.y > SCREEN_HEIGHT and not fruit.sliced:
                 if fruit.type != "bomb":
                     self.lives -= 1
@@ -151,6 +151,7 @@ class Game:
 
         if self.lives <= 0:
             self.state = STATE_GAME_OVER
+            self.fruits.clear()
 
     def update_positions(self):
         self.icon_x = SCREEN_WIDTH * 0.02
