@@ -63,7 +63,7 @@ def load_background_images(directory):
         if filename.lower().endswith((".png", ".jpg", ".jpeg")):
             background_name = os.path.splitext(filename)[0]  # Get the name without extension
             image = pygame.image.load(os.path.join(directory, filename))
-            pygame.transform.scale(image, (SCREEN_WIDTH, SCREEN_HEIGHT))
+            image = pygame.transform.scale(image, (SCREEN_WIDTH, SCREEN_HEIGHT))
             backgrounds[background_name] = image
     return backgrounds
 
@@ -91,7 +91,7 @@ def resize_image(image, max_size=120):
     # Perform the resizing
     return pygame.transform.scale(image, (new_width, new_height))
 
-# Load fruit and kaboom images
+# Load fruit and slice images
 fruit_images = load_fruit_images("assets/fruits")
 slice_frames = load_gif_frames("assets/effects/slice.gif")
 

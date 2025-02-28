@@ -1,19 +1,32 @@
+"""This file holds everything responsible for representing a fruit."""
 import pygame
 from resources import fruit_images, slice_frames
 from constants import *
 import random
 
 class Fruit:
-    def __init__(self, fruit_type, x, y, trajectory):
+    """
+    Class representing the fruit in the Fruit Ninja game.
+    """
+    def __init__(self, fruit_type: str, x: int, y: int, trajectory: tuple[int, int]):
+        """
+        Initialize the Fruit object with provided values.
+
+        :param fruit_type: The name of an image file from assets/fruits without the file extension
+        :param x: The x-coordinate of the fruit's position
+        :param y: The y-coordinate of the fruit's position
+        :param trajectory: The x and y velocity of the fruit
+        """
         self.type = fruit_type
+        self.x = x
+        self.y = y
+        self.trajectory = trajectory
+        self.angle = 0
+        self.rotate_direction = random.choice(range(-25, 25))
+
         self.frames = fruit_images[fruit_type]
         self.frame_index = 0
         self.image = self.frames[self.frame_index]
-        self.x = x
-        self.y = y
-        self.angle = 0
-        self.rotate_direction = random.choice(range(-25, 25))
-        self.trajectory = trajectory
         self.hitbox = self.image.get_rect(topleft=(self.x, self.y))
         self.sliced = False
         self.last_frame_time = pygame.time.get_ticks()

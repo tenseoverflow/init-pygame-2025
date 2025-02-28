@@ -1,9 +1,27 @@
+"""This file holds everything responsible for representing a button."""
 import pygame
+from pygame import SurfaceType
+
 from resources import font
 import time
 
 class Button:
+    """
+    Class representing the button in the Fruit Ninja game.
+    """
     def __init__(self, text, text_color, x, y, color, hover_color, action=None, padding=(20, 10)):
+        """
+        Initialize the Button object with provided values.
+
+        :param text:
+        :param text_color:
+        :param x:
+        :param y:
+        :param color:
+        :param hover_color:
+        :param action:
+        :param padding:
+        """
         self.text = text
         self.text_color = text_color
         self.color = color
@@ -23,7 +41,12 @@ class Button:
         self.y = y - self.height // 2
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
         
-    def draw(self, screen):
+    def draw(self, screen: SurfaceType) -> None:
+        """
+        Draw the button on the game screen.
+
+        :param screen: to draw the button on
+        """
         mouse_pos = pygame.mouse.get_pos()
         click = pygame.mouse.get_pressed()[0]
         

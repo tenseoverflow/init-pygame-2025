@@ -1,3 +1,4 @@
+"""The Game screen."""
 import pygame
 from constants import *
 

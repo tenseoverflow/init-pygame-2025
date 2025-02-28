@@ -8,7 +8,6 @@ pygame.init()
 pygame.mixer.init()
 from game_screen import screen
 from resources import *
-from constants import *
 from button import *
 from fruit import *
 
@@ -223,11 +222,11 @@ class Game:
     def draw_game_over(self):
         screen.blit(backgrounds[self.selected_map], (0, 0))
         screen.blit(game_over_overlay, (0, 0))
-        
+
         score_text = big_font.render(f"SCORE: {self.score}", True, PRIMARY)
         score_x = (SCREEN_WIDTH - score_text.get_width()) // 2
         screen.blit(score_text, (score_x, 150))
-        
+
         highscore_text = font.render(f"HIGHSCORE: {self.highscore}", True, PRIMARY)
         highscore_x = (SCREEN_WIDTH - highscore_text.get_width()) // 2
         screen.blit(highscore_text, (highscore_x, 230))
