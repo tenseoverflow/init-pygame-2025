@@ -19,13 +19,13 @@ pygame.display.set_icon(icon)
 # Clock
 clock = pygame.time.Clock()
 
-game_over_overlay = pygame.Surface(
-    (SCREEN_WIDTH, SCREEN_HEIGHT), pygame.SRCALPHA).convert_alpha()  # Creating a surface with supports transparency
+game_over_overlay = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.SRCALPHA).convert_alpha()
 game_over_overlay.fill(pygame.Color(0, 0, 0, 127))
 
 
 class Game:
     def __init__(self):
+        """Initialize the Fruit Ninja game."""
         self.running = True
         self.state = STATE_MENU
         self.selected_map = "Dojo"
@@ -36,8 +36,9 @@ class Game:
         self.highscore = self.load_highscore()
         self.create_buttons()
 
+        # If another sound was being played, stop it.
         pygame.mixer.stop()
-        sounds["soundtrack"].play(-1)
+        # TODO: Play the soundtrack here!
 
         self.life_images = [
             pygame.image.load(f"assets/lives/lives_{i}.png").convert_alpha() for i in range(4)
@@ -72,21 +73,24 @@ class Game:
         self.selected_map = map_name
         self.background = backgrounds[self.selected_map]
         pygame.mixer.stop()
-        sounds["flute"].play()
-        sounds["ambience"].play(-1)
+        flute_sound.play()
+        # TODO: Play the ambience sound here!
+
         self.state = STATE_PLAYING
 
     def to_main_menu(self):
         pygame.mixer.stop()
-        sounds["soundtrack"].play(-1)
+        # TODO: Play the soundtrack here!
+
         self.score = 0
         self.lives = 3
         self.state = STATE_MENU
 
     def restart_game(self):
         pygame.mixer.stop()
-        sounds["flute"].play()
-        sounds["ambience"].play(-1)
+        flute_sound.play()
+        # TODO: Play the ambience sound here!
+
         self.score = 0
         self.lives = 3
         self.state = STATE_PLAYING
@@ -100,11 +104,16 @@ class Game:
         x = random.randint(150, SCREEN_WIDTH - 150)
         y = SCREEN_HEIGHT
         trajectory = (random.choice([-2, 2]), random.randint(-20, -18))
-        self.fruits.append(Fruit(fruit_type, x, y, trajectory))
+
+        # TODO: Create a new Fruit using the provided parameters
+        #       and append it to the list self.fruits
+
         if fruit_type == "bomb":
-            sounds["bomb_throw"].play()
+            # TODO: Play the bomb throw sound here!
+            ...
         else:
-            sounds["throw"].play()
+            # TODO: Play the regular fruit throw sound here!
+            ...
 
     def load_highscore(self):
         try:
@@ -114,8 +123,10 @@ class Game:
             return 0
 
     def save_highscore(self):
-        with open("highscore.txt", "w") as file:
-            file.write(str(self.highscore))
+        # TODO: Write the current self.highscore to the file "highscore.txt".
+        #       If you get an error, then make sure you convert the high score
+        #       to str before writing it to the file.
+        ...
 
     def handle_slicing(self):
         mouse_pos = pygame.mouse.get_pos()
@@ -123,34 +134,38 @@ class Game:
             if fruit.hitbox.collidepoint(mouse_pos) and not fruit.sliced:
                 fruit.slice()
                 if fruit.type == "bomb":
-                    sounds["kaboom"].play()
-                    self.lives = 0
-                    self.state = STATE_GAME_OVER
-                    self.fruits.clear()
+                    # TODO: Oh no, we have sliced a bomb! Set self.lives to 0,
+                    #       self.state to STATE_GAME_OVER and clear self.fruits.
+
+                    # TODO: Play the explosion sound here!
+                    ...
                 else:
-                    sounds["slice"].play()
-                    self.score += 1
+                    # TODO: We have sliced a fruit, add +1 to self.score.
+
+                    # TODO: Play the fruit slicing sound here!
+                    ...
                 if self.score > self.highscore:
                     self.highscore = self.score
 
 
     def update(self):
-        difficulty = int(round(69 - (self.score / 5)))
-        if (difficulty) != 0 and random.randint(1, difficulty) == 1:
+        # Spawn new fruits
+        if random.randint(1, 50) == 1:
             self.spawn_fruit()
 
         self.fruits = [fruit for fruit in self.fruits if fruit.move()]
 
+        # Check if any fruits have gone off-screen without being sliced
         for fruit in self.fruits.copy():
             if fruit.y > SCREEN_HEIGHT and not fruit.sliced:
                 if fruit.type != "bomb":
                     self.lives -= 1
-                    sounds["miss"].play()
+                    # TODO: Play the missing fruit sound here!
+
                 self.fruits.remove(fruit)
 
-        if self.lives <= 0:
-            self.state = STATE_GAME_OVER
-            self.fruits.clear()
+        # TODO: If self.lives is equal to zero or less than zero (<=), then
+        #       set self.state to STATE_GAME_OVER and clear self.fruits.
 
     def update_positions(self):
         self.icon_x = SCREEN_WIDTH * 0.02
@@ -180,7 +195,7 @@ class Game:
                 highscore_text = font.render(f"BEST: {self.highscore}", True, PRIMARY)
                 screen.blit(highscore_text, (self.highscore_x, self.highscore_y))
 
-            life_image = self.life_images[self.lives]
+            life_image = self.life_images[self.lives] if self.lives > 0 else self.life_images[0]
             screen.blit(life_image, (self.life_x, self.life_y))
 
         elif self.state == STATE_GAME_OVER:

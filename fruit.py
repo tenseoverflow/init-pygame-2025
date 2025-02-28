@@ -36,11 +36,19 @@ class Fruit:
         self.slice_frame_count = 0
 
     def move(self):
+        """
+        This method makes the fruit move.
+
+        This method runs once every frame.
+        """
         if not self.sliced:
-            self.angle += self.rotate_direction
-            self.x += self.trajectory[0]
-            self.y += self.trajectory[1]
-            self.trajectory = (self.trajectory[0], self.trajectory[1] + GRAVITY)
+            # TODO: Add the first element (with index 0) of the trajectory to the fruit's
+            #       X-coordinate (self.x) and the second element of the trajectory
+            #       to the fruit's Y-coordinate (self.y).
+            #       Also, replace the trajectory with an updated one, where the first
+            #       element remains unchanged, but GRAVITY gets added to the second one.
+
+            # TODO: Add self.rotate_direction to self.angle to make the fruits spin!
 
             self.hitbox.topleft = (self.x, self.y)
             if pygame.time.get_ticks() - self.last_frame_time > 50:
@@ -58,6 +66,10 @@ class Fruit:
         return True
 
     def draw(self, surface):
+        """
+        This method draws the fruit on the screen.
+        :param surface: to draw the fruit on
+        """
         rotated_image = pygame.transform.rotate(self.image, self.angle)
         new_rect = rotated_image.get_rect(center = self.image.get_rect(topleft = (self.x, self.y)).center)
 
