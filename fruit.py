@@ -18,9 +18,11 @@ class Fruit:
         :param trajectory: The x and y velocity of the fruit
         """
         self.type = fruit_type
+        
         self.x = x
         self.y = y
         self.trajectory = trajectory
+
         self.angle = 0
         self.rotate_direction = random.choice(range(-25, 25))
 
@@ -39,8 +41,8 @@ class Fruit:
             self.x += self.trajectory[0]
             self.y += self.trajectory[1]
             self.trajectory = (self.trajectory[0], self.trajectory[1] + GRAVITY)
-            self.hitbox.topleft = (self.x, self.y)
 
+            self.hitbox.topleft = (self.x, self.y)
             if pygame.time.get_ticks() - self.last_frame_time > 50:
                 self.frame_index = (self.frame_index + 1) % len(self.frames)
                 self.image = self.frames[self.frame_index]
