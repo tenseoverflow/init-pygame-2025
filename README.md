@@ -4,7 +4,7 @@
 
 - [Abivahendid](#abivahendid)
 - [Sissejuhatus](#sissejuhatus)
-- [Ülesanded](#%C3%BClesanded)
+- [Ülesanded](#ülesanded)
     - [🐍 PyGame paigaldamine](#-pygame-paigaldamine)
     - [🍉 Puuviljade loomine](#-puuviljade-loomine)
     - [🍏 Puuviljade liikumine](#-puuviljade-liikumine)
@@ -40,27 +40,30 @@ Dr. Google'it! Peamine eesmärk on **õppida ja lõbutseda!** 🎮
 
 ### 🐍 PyGame paigaldamine
 
-Enne koodi kirjutamist peame PyGame paigaldama. Avame kooditöötlusprogrammi (nt PyCharm), laadime alla projekti koodi ja
-avame terminali (`>_`). Seejärel käivitame käsu:
 
-```sh
-pip install pygame
-```
-
-Kui tekib probleeme, küsi julgelt abi!
+Enne programmeerima hakkamist tuleb meil avada kooditöötlusprogramm PyCharm, laadida alla meie kood, ning paigaldada
+mängumootor PyGame ja pilditöötlusteek Pillow. Kõik kolm sammu teeme koos tunnis läbi. PyGame ja Pillowi paigaldamiseks
+on vajalik avada PyCharmis Terminal (all vasakul, näeb välja nagu `>_`). Sinna tuleb sisestada käsklus
+`pip install pygame` ning vajutada ENTER. Kui see käsk on edukalt lõpuni jooksnud, siis käivita uus käsk
+`pip install pillow`. Kui tekib mingi probleem, siis tõsta julgelt käsi, kõik abiõppejõud ongi siin selleks, et teid
+aidata! Pärast seda saame hakata mängu koodi kallal tööd tegema.
 
 ### 🍉 Puuviljade loomine
 
 1. **Puuviljad peaksid ilmuma juhuslikult ekraani alumisse serva.**
-   Mine faili `fruit_ninja.py` ja otsi sealt üles funktsioon `spawn_fruit()`.
+   Kui soovid ükskõik millisel hetkel mängu käima panna, siis ava PyCharmis fail `fruit_ninja.py` ning vajuta ▶️ play
+   nupule!
+
+   Alustuseks mine faili `fruit_ninja.py` ja otsi sealt üles funktsioon `def spawn_fruit()`.
 
    Kui `spawn_fruit()` funktsioon käivitatakse, määratakse igale uuele puuviljale tüüp, alguspunkt ja trajektoor.
 
     - Puuvilja tüüp valitakse juhuslikult sõnastikust `fruit_images`, kasutades selleks funktsiooni `random.choice()`.
-    - Alguspunkt `x` määratakse vahemikus `150` kuni `SCREEN_WIDTH - 150`, et need ei ilmuks liiga lähedale servadele.
-      `y` koordinaat seatakse alati väärtusele `SCREEN_HEIGHT`, et puuviljad ilmuksid ekraani allservas.
+      - See sõnastik tekitatakse automaatselt kaustas `assets/fruits` olevate pildifailide alusel.
+    - Alguspunkt `x` määratakse vahemikus `150` kuni `SCREEN_WIDTH - 150`, et puuviljad ei ilmuks liiga lähedale
+      akna servadele. `y` koordinaat seatakse alati väärtusele `SCREEN_HEIGHT`, et puuviljad ilmuksid ekraani allservas.
     - Liikumise trajektoor koosneb horisontaalsest kiirusest, mille väärtus võib olla `-2` või `2`, ning vertikaalsest
-      kiirusest, mis jääb vahemikku `-20` kuni `-18`.
+      kiirusest, mis valitakse suvaliselt vahemikust `-20` kuni `-18`.
 
    Kui see funktsioon välja kutsutakse, siis tuleks luua uus `Fruit` objekt. Sellele objektile peab argumentidena
    kaasa andma eelnevalt välja arvutatud `fruit_type`, `x`, `y` ja `trajectory` väärtused. Lõpuks tuleb vastloodud
@@ -92,13 +95,13 @@ fruits.append(new_fruit)
 
    Puuviljad peaksid lendama üles, ja seejärel taas gravitatsiooni mõjul alla kukkuma!
 
-   Kõigepealt mine faili `constants.py` ja defineeri gravitatsioonikonstant.
+   Esimesena mine faili `constants.py` ja defineeri gravitatsioonikonstant.
 
    Loo muutuja (konstant) `GRAVITY` ja anna sellele väärtuseks `0.3`, et simuleerida raskusjõudu. Võid muidugi seda
    väärtust timmida, et mängu huvitavamaks muuta. 😉
 
-   Nüüd otsi üles fail `fruit.py`. Selles failis on kirjas kogu puuviljadega seonduv loogika. Hakkame muutma puuvilja
-   koordinaate, kasutades selleks varem mainitud trajektoori väärtusi.
+   Otsi üles fail `fruit.py`. Selles failis on kirjas kogu puuviljadega seonduv loogika. Nüüd hakkame muutma puuvilja
+   koordinaate, kasutades selleks varem mainitud trajektoori väärtusi!
 
    Iga kaader kutsutakse välja `def move()` funktsiooni. Sinna alla pead kirjutama puuvilja liikumise koodi!
 
@@ -120,7 +123,7 @@ fruits.append(new_fruit)
     <summary>💡 Kuidas luua, liita ja lahutada muutujaid Python-is?</summary>
    
     ```py
-    # Loome muutuja 'x', ning seame selle väärtuseks 0.
+    # Loome muutuja 'x', ning seame selle väärtuseks 1.
     x = 1
     x += 5  # muutujale viie liitmine
             # x on nüüd 1 + 5 = 6
@@ -130,6 +133,8 @@ fruits.append(new_fruit)
     teine_muutuja = 5
     x += teine_muutuja
     # x on nüüd 4 + teine_muutuja = 4 + 5 = 9
+    x = 2 + teine_muutuja # muutujale uue väärtuse määramine teise muutuja abil
+                          # x on nüüd 2 + teine_muutuja = 2 + 5 = 7
     ```
     </details>
 
@@ -148,8 +153,8 @@ fruits.append(new_fruit)
 
 Kui puuvili on pooleks lõigatud, siis peaksime mängijale lisama juurde ühe punkti.
 
-Mine faili `fruit_ninja.py` ja otsi üles `def handle_slicing()` funktsioon, mis vastutab puuviljade lõikamise loogika
-eest.
+Mine faili `fruit_ninja.py` ja otsi üles `def handle_slicing()` funktsioon, mis vastutab puuviljade pooleks lõikamise
+loogika eest.
 
 Kui puuvili on pooleks lõigatud, siis lisa `self.score` väärtusele +1, et arvestada iga lõigatud puuvilja eest mängijale
 punkt.
@@ -174,7 +179,7 @@ Kui lõigatud objekt on pomm, siis:
 
 Praegu oleme määranud, et mäng lõppeb, kui mängija elud saavad otsa või kui lõigatakse pooleks pomm. Pommi
 poolekslõikamisega tegelesime me eelmises punktis, ent hetkeseisuga pole meil veel süsteemi, mis automaatselt
-kontrolliks, kas mängija elud on nulli jõudnud, ning seejärel mäng lõpetada.
+kontrolliks, kas mängija elud on nulli jõudnud, et seejärel mäng lõpetada.
 
 Endiselt toimetame failis `fruit_ninja.py`. Seekord otsi üles `def update()` funktsioon.
 Kui elud (`self.lives`) saavad nulli (või jäävad alla nulli, võimalike bugide vältimiseks), siis:
@@ -189,7 +194,8 @@ parim skoor kaduma ei läheks.
 
 Ja taaskord muudame faili `fruit_ninja.py`. Otsi sealt üles funktsioon `def save_highscore()`. Siin tuleb teha järgmist:
 
-1. Avage fail `"highscore.txt"` kirjutamisrežiimis. Selle kohta võib rohkem lugeda näiteks [PyDocist](https://pydoc.pages.taltech.ee/input_output/write_to_file/writing-into-existing-file.html).
+1. Avage fail `"highscore.txt"` kirjutamisrežiimis. Selle kohta võib rohkem lugeda näiteks
+   [PyDocist](https://pydoc.pages.taltech.ee/input_output/write_to_file/writing-into-existing-file.html).
 2. Kirjutage praegune parim skoor (`self.highscore`) faili. Enne kirjutamist tuleb see konverteerida `str()` meetodi,
    abil sõneks (string), kuna faili kirjutamine nõuab sõne andmetüüpi.
 
