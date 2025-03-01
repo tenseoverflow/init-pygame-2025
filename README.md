@@ -1,228 +1,238 @@
-![Fruit Ninja - init2025 edition](images/logo.png "Fruit Ninja - init2025 edition")
+![Fruit Ninja - init2025 edition](assets/icon.png "Fruit Ninja - init2025 edition")
 
-# init 2025 - mängu töötuba
+# Fruit Ninja - init2025 edition
 
 - [Abivahendid](#abivahendid)
 - [Sissejuhatus](#sissejuhatus)
 - [Ülesanded](#%C3%BClesanded)
-  - [🐍 PyGame paigaldamine](#-pygame-paigaldamine)
-  - [🐦 Linnu loomine](#-linnu-loomine)
-  - [🦅 Linnulennu loomine](#-linnulennu-loomine)
-  - [🏃‍♂️💨 Torud liikuma](#%EF%B8%8F-torud-liikuma)
-  - [👹 Uute torude loomine](#-uute-torude-loomine)
-  - [🔢 Skoori arvutamine](#-skoori-arvutamine)
-  - [🔊 Heliefektide lisamine](#-heliefektide-lisamine)
-  - [⭐ Boonusülesanded](#-boonus%C3%BClesanded)
+    - [🐍 PyGame paigaldamine](#-pygame-paigaldamine)
+    - [🍉 Puuviljade loomine](#-puuviljade-loomine)
+    - [🍏 Puuviljade liikumine](#-puuviljade-liikumine)
+    - [🔢 Skoori arvutamine](#-skoori-arvutamine)
+    - [💥 Pommi lõikamine](#-pommi-lõikamine)
+    - [💔 Kaotusseisu tuvastamine](#-kaotusseisu-tuvastamine)
+    - [🏆 Parima skoori salvestamine](#-parima-skoori-salvestamine)
+    - [🔊 Heliefektide lisamine](#-heliefektide-lisamine)
+    - [⭐ Boonusülesanded](#-boonusülesanded)
 
 ## Abivahendid
-Kõige olulisem abivahend selles töötoas on **oskus küsida küsimusi**. Küsimusi soovitame julgelt küsida klassis ringi liikuvate **abiõppejõudude käest**, kes on meeleldi valmis vastama kõigile küsimustele, mis tekkida võivad. Ära tunned abiõppejõu musta TalTechi T-särgi või pusa järgi. Kui abiõppejõud Sinu küsimusele vastata ei oska, siis tasub appi võtta [**Dr. Google**](https://google.ee). Väga suure tõenäosusega on keegi sama probleemiga juba maadelnud, ning sellele ka lahenduse leidnud. Veel võid abi leida [PyGame ametlikust dokumentatsioonist](https://www.pygame.org/docs/). Ning kui kõigile abivahenditele vaatamata siiski mingi asjaga hätta jääd, siis meie projekti kaustast [`solutions`](https://github.com/taltech-coding/init-pygame-2025/tree/main/solutions) võid leida ka ülesannete koostajate lahendused. Tunnis kasutatud slaidiesitlust on võimalik järele vaadata [siit](https://docs.google.com/presentation/d/1Tx6Us4cHqSNCZh6fkEnREpzOUHxgPIb2akcuWgAFb8Q/edit)!
+
+Kõige olulisem abivahend selles töötoas on **oskus küsida küsimusi**. Küsimusi soovitame julgelt küsida klassis ringi
+liikuvate **abiõppejõudude käest**, kes on valmis vastama kõikidele küsimustele. Kui abiõppejõud ei oska aidata, võid
+kasutada ka [**Dr. Google'it**](https://google.ee), [PyGame dokumentatsiooni](https://www.pygame.org/docs/) või meie
+projekti kaustas [`solutions`](https://github.com/taltech-coding/init-pygame-2025/tree/main/solutions) olevaid
+lahendusi. Tunnis kasutatud slaidiesitlust saab järele
+vaadata [siit](https://docs.google.com/presentation/d/1Tx6Us4cHqSNCZh6fkEnREpzOUHxgPIb2akcuWgAFb8Q/edit)!
 
 ## Sissejuhatus
-Oled praktikant ja sinu ülesandeks on anda viimane lihv tulevasele AAAA mängule "Fruit Ninja - init2025 edition"!
 
-Aga oh aeg - pool koodi on kogemata ära kustunud, sest üks töötajatest unustas oma muudatused salvestada!
+Oled praktikant ja sinu ülesandeks on anda viimane lihv tulevasele AAAA mängule **"Fruit Ninja - init2025 edition"**!
 
-Õnneks on jäänud alles varasemad arendaja juhised koodi dokumentatsioonis, seega saad selle abil koodi uuesti valmis kirjutada ja mängu jõuab veel õigel ajal Steami üles panna!
+Aga oh ei - osa koodi on kogemata kaduma läinud, sest üks töötaja unustas muudatused salvestamata! Õnneks on alles
+varasemad arendaja juhised dokumentatsioonis, mis aitavad sul mängu taastada ja õigeks ajaks Steami üles laadida!
 
-Mäng on loodud mängumootor [PyGame](https://www.pygame.org/docs/) abil.
+Mäng on loodud [PyGame](https://www.pygame.org/docs/) abil.
 
 ## Ülesanded
 
-Oleme sulle ette valmistanud ülesanded ning ka lahendamiseks vajalikud juhtnöörid. Kui vajad abi, tõsta julgelt käsi 🙋‍♀️ või küsi Dr. Google-ilt. Peaasi on see, et täna siit midagi õpiksid!
+Oleme sulle ette valmistanud ülesanded ning juhtnöörid nende lahendamiseks. Kui vajad abi, tõsta julgelt käsi või kasuta
+Dr. Google'it! Peamine eesmärk on **õppida ja lõbutseda!** 🎮
 
 ### 🐍 PyGame paigaldamine
 
-Enne programmeerima hakkamist tuleb meil avada kooditöötlusprogramm PyCharm, laadida alla meie kood, ning paigaldada PyGame. Kõik kolm sammu teeme koos tunnis läbi. PyGame paigaldamiseks on vajalik avada PyCharmis Terminal (all vasakul, näeb välja nagu `>_`. Sinna tuleb sisestada käsklus `pip install pygame` ning vajutada ENTER. Kui tekib mingi probleem, siis tõsta julgelt käsi, kõik abiõppejõud ongi siin selleks, et teid aidata! Pärast seda saame hakata mängu koodi kallal tööd tegema. 
+Enne koodi kirjutamist peame PyGame paigaldama. Avame kooditöötlusprogrammi (nt PyCharm), laadime alla projekti koodi ja
+avame terminali (`>_`). Seejärel käivitame käsu:
+
+```sh
+pip install pygame
+```
+
+Kui tekib probleeme, küsi julgelt abi!
 
 ### 🍉 Puuviljade loomine
 
-Esiteks on meil vaja sisse laadida pilt linnukesest. Meil on sulle juba `images` kaustas ette antud pilt Agost, keda võid "linnukesena" kasutada: `images/bird.png`.
+1. **Puuviljad peaksid ilmuma juhuslikult ekraani alumisse serva.**
+   Mine faili `fruit_ninja.py` ja otsi sealt üles funktsioon `spawn_fruit()`.
 
-Et pilt sisse laadida, muudame `resources.py` faili. Näidisena on meil juba eelnevalt muutujasse `background_img` laetud taustapilt. Nüüd lae ise `"images/bird.png"` või mõni muu meeldiv pilt linnupildiks sisse. Muutuja nimeks peab olema `bird_img`.
+   Kui `spawn_fruit()` funktsioon käivitatakse, määratakse igale uuele puuviljale tüüp, alguspunkt ja trajektoor.
 
-> `bird_img = ???`
+    - Puuvilja tüüp valitakse juhuslikult sõnastikust `fruit_images`, kasutades selleks funktsiooni `random.choice()`.
+    - Alguspunkt `x` määratakse vahemikus `150` kuni `SCREEN_WIDTH - 150`, et need ei ilmuks liiga lähedale servadele.
+      `y` koordinaat seatakse alati väärtusele `SCREEN_HEIGHT`, et puuviljad ilmuksid ekraani allservas.
+    - Liikumise trajektoor koosneb horisontaalsest kiirusest, mille väärtus võib olla `-2` või `2`, ning vertikaalsest
+      kiirusest, mis jääb vahemikku `-20` kuni `-18`.
 
-Peale pildi sisselaadimist on teda vaja ekraanile ilmutada.
+   Kui see funktsioon välja kutsutakse, siis tuleks luua uus `Fruit` objekt. Sellele objektile peab argumentidena
+   kaasa andma eelnevalt välja arvutatud `fruit_type`, `x`, `y` ja `trajectory` väärtused. Lõpuks tuleb vastloodud
+   Fruit objekt lisada `self.fruits` nimekirja.
 
-Et lindu ekraanile ilmutada, muudame `bird.py` faili.
-
-Sealt otsi üles funktsioon `def draw():`. Kutsume selle all välja meetodi `screen.blit`.
+    <details>
+    <summary>💡 Kuidas luua uusi muutujaid ja objekte Pythonis?</summary>
 
 ```py
-screen.blit(bird_img, (self.x, self.y))
-# Ilmutame ekraanile linnu x ja y koordinaatidele linnu pildi.
+
+# Loome muutuja 'fruit_type' ja määrame selle väärtuseks "apple".
+fruit_type = "apple"
+x = 200  # määrame koordinaadi x-teljele
+y = 600  # määrame koordinaadi y-teljele
+trajectory = (-2, -19)  # määrame liikumise trajektoori
+
+# Loome 'Fruit' objekti, kasutades eelnevalt määratud muutujaid.
+new_fruit = Fruit(fruit_type, x, y, trajectory)
+
+# Lisame objekti nimekirja, et seda saaks mängus kasutada.
+fruits.append(new_fruit)
 ```
 
-Ava PyCharmis fail `flappy_bird.py`, vajuta ▶️ play nupule, ning näed, et sul ongi ekraanil linnuke!
+</details>
 
-### 🦅 Puuviljad lendama
+### 🍏 Puuviljade liikumine
 
-1. **Linnuke peaks gravitatsiooni tagajärjel pidevalt kukkuma.**
+1. **Puuviljade liikumise arvutamine**
 
-    Linnukesel on muutuja `self.velocity`, mis näitab linnu kiirust y-koordinaadi suhtes. Peaksime igal kaadril e. frame'il liitma sellele kiirusele gravitatsiooni kiirenduse.
+   Puuviljad peaksid lendama üles, ja seejärel taas gravitatsiooni mõjul alla kukkuma!
 
-    Loo faili `constants.py` muutuja `GRAVITY` - selle väärtuseks sea `1.2`. Võid muidugi seda väärtust timmida, et mängu huvitavamaks muuta. 😉
+   Kõigepealt mine faili `constants.py` ja defineeri gravitatsioonikonstant.
 
-    Seejärel otsi failist `bird.py` üles `class Bird`. Selle all on funktsioonid, mis seonduvad linnuga. Iga kaader kutsutakse välja `def update()` funktsiooni. Sinna alla pead kirjutama kiirenduse koodi!
+   Loo muutuja (konstant) `GRAVITY` ja anna sellele väärtuseks `0.3`, et simuleerida raskusjõudu. Võid muidugi seda
+   väärtust timmida, et mängu huvitavamaks muuta. 😉
 
-    Lisaks `self.velocity`-le `GRAVITY` liitmise tuleb igal kaadril `self.y`-ile, ehk linnu y-koordinaadile, liita tema kiirus y-koordinaadi suhtes, ehk `self.velocity`.
+   Nüüd otsi üles fail `fruit.py`. Selles failis on kirjas kogu puuviljadega seonduv loogika. Hakkame muutma puuvilja
+   koordinaate, kasutades selleks varem mainitud trajektoori väärtusi.
+
+   Iga kaader kutsutakse välja `def move()` funktsiooni. Sinna alla pead kirjutama puuvilja liikumise koodi!
+
+   Esimene trajektoorielement (`self.trajectory[0]`) näitab puuvilja liikumise kiirust X-telje suhtes. Seega tuleks
+   igal kaadril liita `self.x`-ile (puuvilja X-koordinaadile) `self.trajectory[0]` (puuvilja kiirust X-telje suhtes).
+   Teine trajektoorielement (`self.trajectory[1]`) näitab järelikult puuvilja liikumise kiirust Y-telje suhtes, ning
+   tema väärtus tuleks igal kaadril liita `self.y`-ile (puuvilja Y-koordinaadile).
+
+   Proovi pärast nende muudatuste tegemist mängu käima panna! Ava PyCharmis fail `fruit_ninja.py`, vajuta ▶️ play
+   nupule, ning näed, et mängu alustades lendavad nüüd ringi puuviljad!
+
+   Aga nagu tähelepanelik uudistaja kindlasti märkab, siis puuviljad lendavad ekraanil ainult ülespoole. Et seda viga
+   parandada, kasutame varem loodud gravitatsioonikonstanti, et uuendada trajektoori. Muudame igal kaadril trajektoori
+   väärtust nii, et jätame esimese väärtuse (`self.trajectory[0]`) samaks, kuid liidame teisele väärtusele
+   (`self.trajectory[1]`) otsa `GRAVITY`. Uue trajektoori salvestamiseks saame kasutada koodirida
+   `self.trajectory = (esimene väärtus, teine väärtus)`.
 
     <details>
     <summary>💡 Kuidas luua, liita ja lahutada muutujaid Python-is?</summary>
-
+   
     ```py
     # Loome muutuja 'x', ning seame selle väärtuseks 0.
-    x = 0
+    x = 1
     x += 5  # muutujale viie liitmine
-            # x on nüüd 0 + 5 = 5
+            # x on nüüd 1 + 5 = 6
     x -= 2  # muutujast kahe lahutamine
-            # x on nüüd 5 - 2 = 3
+            # x on nüüd 6 - 2 = 4
     # saad ka liita mõne muu muutuja võrra
     teine_muutuja = 5
     x += teine_muutuja
-    # x on nüüd 3 + teine_muutuja = 3 + 5 = 8
+    # x on nüüd 4 + teine_muutuja = 4 + 5 = 9
     ```
     </details>
 
-&nbsp;
 
-2. **Kui mängija vajutab tühikule, peaks linnuke ülespoole hüppama.**
+2. **Puuviljade keerlemise arvutamine**
 
-    Siin uuendame linnukese kiirust, kuid seekord sätime linnu kiiruse hüppamise kiiruseks.
+   Puuviljad peaksid mängus visuaalselt pöörlema. Selleks tuleb igal kaadril nende pöördenurka uuendada.
 
-    Et PyGame arvutab koordinaate "tagurpidi" (numbrid suurenevad ülevalt alla liikudes), peaks üles liikumiseks kiirus olema negatiivne.
+   Mine taaskord faili `fruit.py`, ning leia sealt funktsioon `def move()`, kus toimub puuviljade liikumise määramine.
 
-    Arvesta, et ekraani miinimumpunkt (0,0) asub ekraani vasakul üleval nurgas ja maksimumpunkt all paremal nurgas!
-
-     ```
-    # Näidis ekraani koordinaatidest
-    
-    MIN----->600 (x)
-    |   E   |
-    |   K   |
-    |   R   |
-    |   A   |
-    |   A   |
-    |   N   |
-    v------MAX
-    900
-
-    (y)
-    ```
-
-    Loo faili `constants.py` muutuja `BIRD_JUMP`, ning sea selle väärtuseks `15`.
-
-    Sulle on faili `bird.py` valmis tehtud `def flap()` funktsioon, mida kutsutakse välja siis, kui vajutatakse tühikule.
-
-    Selle funktsiooni all peaksid `self.velocity` muutujaks seadma NEGATIIVSE `BIRD_JUMP`-i väärtuse.
-
-3. **Kui linnuke puudutab maad, peaks mäng lõppema.**
-
-    Selle jaoks tuleb realiseerida failis `bird.py` funktsioon `check_collision_with_floor()`. 
-    
-    Ülevalt alla liikudes y-koordinaat suureneb. Seega, juhul kui linnu y-koordinaat on suurem kui ekraani kõrgus, millest on lahutatud linnupildi enda kõrgus, siis tuleks tagastada `True`. Igal muul juhul tuleks tagastada `False`.
-
-    Vastavalt eelnevatele lausetele saame sellesse funktsiooni kirjutada järgneva `if` kontroll-lause:
-    
-    Juhul kui `self.y` on suurem kui `SCREEN_HEIGHT - 50`, siis tagasta (ehk `return`) `True`, muul juhul (`else`) tagasta `False`. 
-
-### 🏃‍♂️💨 Torud liikuma
-
-Lisada `pipe.py` failis `def update():` meetodi alla koodijupp, mis iga kaader lahutab `self.x`-ist konstandi `PIPE_VELOCITY`.
-
-Toru liikumise kiirust (`PIPE_VELOCITY`) võid soovi korral timmida failis `constants.py`.
-
-
-### 👹 Uute torude loomine
-
-Iga natukese aja tagant peaks tekkima ekraanile uus toru, mille vahelt peab linnuke läbi lendama.
-
-Meil on järjend (justkui nimekiri) torudest, mida hoitakse muutujas `pipes`. See muutuja asub failis `flappy_bird.py`. Kui soovime pääseda ligi mõnele kindlale elemendile selles järjendis, siis seda saame teha \[kantsulgude\] abil.
-
-Kui soovime saada kätte järjendist elemendi (meil siis toru) indeksiga 0, siis peaksime kasutama viidet `pipes[0]`. Tasub tähele panna, et miinusmärgiga indeksid võimaldavad järjendi elemente kätte saada "tagantpoolt". Seega viide `pipes[-1]` annab meile selle järjendi viimase elemendi.
-
-Uute torude tekitamiseks tuleb kirjutada paar rida koodi. Selleks sobiv koht on failis `flappy_bird.py`. 
-
-> Õiget kohta näitab kommentaar `# TODO: Generate new pipes`!
-
-Mõistlik oleks näiteks kontrollida, kas järjendi viimane element (`pipes[-1]`) on jõudnud x-teljel koordinaadile, mis on väiksem kui konstandis `DISTANCE_BETWEEN_PIPES` määratud kaugus. Viimase toru x-koordinaati saame küsida viitega `pipes[-1].x`.
-
-Meeldetuletuseks: liikudes paremalt vasakule koordinaatide numbriline suurus väheneb!
-
-<details>
-<summary>💡 Proovi ise mõelda välja, kuidas sellist kontrolli koodis vormistada! Kui oled oma lahenduse välja mõelnud, siis kontrolli siit, kas Sinu lahendus oli õige.</summary>
-
-```py
-if pipes[-1].x < DISTANCE_BETWEEN_PIPES:
-    # Nüüd on õige aeg lisada uus toru!
-```
-</details>
-
-&nbsp;
-
-Juhul kui eelnevalt kirjeldatud tingimus on tõene, siis järelikult on kätte jõudnud õige aeg tekitada uus toru! Selleks kasutame järjendi meetodit `append`, et lisada järjendi lõppu uus toru. Sobiv koodijupp oleks näiteks `pipes.append(Pipe())`. Meenutame veel, et kui mõni koodirida on meil lõppenud kooloniga `:`, siis järgnevat rida peame koodivea vältimiseks alustama taandreaga (selleks saad kasutada klahvi Tab).
+   Kuna seda funktsiooni kutsutakse välja igal kaadril, siis puuvilja pöörlema panemiseks piisab sellest, kui siinkohal
+   `self.angle` väärtusele (puuvilja praegune pöördenurk) liita juurde `self.rotate_direction` (samas failis veidi
+   ülevalpool defineeritud muutuja, mis määrab suvaliselt puuvilja pöörlemise suuna ja kiiruse).
 
 ### 🔢 Skoori arvutamine
 
-Torude vahelt läbimine peaks mängija skoorile andma plusspunkti.
+Kui puuvili on pooleks lõigatud, siis peaksime mängijale lisama juurde ühe punkti.
 
-Esiteks on meil vaja kirjutada kood, mis arvutab välja, kas mängija on torust läbi saanud.
+Mine faili `fruit_ninja.py` ja otsi üles `def handle_slicing()` funktsioon, mis vastutab puuviljade lõikamise loogika
+eest.
 
-Meil on teada, kus asuvad toru ja linnuke koordinaatteljestikul. Siis kui linnukese asukoht x-teljel on suurem kui toru keskpunkt, lisame mängijale punkti.
+Kui puuvili on pooleks lõigatud, siis lisa `self.score` väärtusele +1, et arvestada iga lõigatud puuvilja eest mängijale
+punkt.
 
-Torul on `has_been_passed` muutuja, mis võib olla `True` või `False` ehk tõene või väär.
+Kui tahad oma mängu huvitavamaks muuta, siis võid siinkohal kasutada ka mingit teistsugust skoorinumbrit!
 
-Esiteks otsi failist `flappy_bird.py` üles koodijupp, kus me uuendame iga toru asukohta, ning joonistame igat toru ekraanile. 
+### 💥 Pommi lõikamine
 
-<details>
-<summary>🧐 See peaks välja nägema umbes selline:</summary>
+Kui mängija lõikab pommi, siis kaotab mängija kõik oma elud ja mäng tuleb kohe lõpetada.
 
-```py
-for pipe in pipes.copy():
-    pipe.update()
-    pipe.draw()
+Mine uuesti faili `fruit_ninja.py` ja otsi taaskord üles `def handle_slicing()` funktsioon, kus pesitseb puuviljade ja
+pommide lõikamise loogika.
 
-    # TODO: Detect if bird is currently between pipes.
-    # If yes, add +1 to the score.
-    # Don't forget to update the pipe's has_been_passed value to True!
-    # You can try to play a point sound here as well.
-```
+Kui lõigatud objekt on pomm, siis:
 
-</details>
+1. Seadke mängija elud (`self.lives`) nulli.
+2. Määrake mängu oleku (`self.state`) väärtuseks `STATE_GAME_OVER`, et näidata, et mäng on läbi.
+3. Tühjendage puuviljade nimekiri (`self.fruits`), et ei oleks võimalik pärast mängu lõppu enam mängija skoori
+   suurendada.
 
-&nbsp;
+### 💔 Kaotusseisu tuvastamine
 
-Selle `for` loopi alla, kus me igast torust üle käime, peaksime lisama järgneva `if` kontrolli:
+Praegu oleme määranud, et mäng lõppeb, kui mängija elud saavad otsa või kui lõigatakse pooleks pomm. Pommi
+poolekslõikamisega tegelesime me eelmises punktis, ent hetkeseisuga pole meil veel süsteemi, mis automaatselt
+kontrolliks, kas mängija elud on nulli jõudnud, ning seejärel mäng lõpetada.
 
-Kui `has_been_passed` on `False` ning `bird.x` on suurem kui `pipe.x + 25`, säti, et `has_been_passed` on tõene ehk `True`. Seejärel peaksime ka `score` muutujale liitma ühe. Võiks ka mängida mingit heliefekti? 🤔
+Endiselt toimetame failis `fruit_ninja.py`. Seekord otsi üles `def update()` funktsioon.
+Kui elud (`self.lives`) saavad nulli (või jäävad alla nulli, võimalike bugide vältimiseks), siis:
 
+- Määrake mängu oleku (`self.state`) väärtuseks `STATE_GAME_OVER`, et mäng oleks lõppenud.
+- Tühjendage puuviljade nimekiri (`self.fruits`), et kõik puuviljad kaoksid ekraanilt.
+
+### 🏆 Parima skoori salvestamine
+
+Kui mängija saavutab uue parima skoori, siis tuleb see salvestada faili, et järgmine kord mängu käivitades viimane
+parim skoor kaduma ei läheks.
+
+Ja taaskord muudame faili `fruit_ninja.py`. Otsi sealt üles funktsioon `def save_highscore()`. Siin tuleb teha järgmist:
+
+1. Avage fail `"highscore.txt"` kirjutamisrežiimis. Selle kohta võib rohkem lugeda näiteks [PyDocist](https://pydoc.pages.taltech.ee/input_output/write_to_file/writing-into-existing-file.html).
+2. Kirjutage praegune parim skoor (`self.highscore`) faili. Enne kirjutamist tuleb see konverteerida `str()` meetodi,
+   abil sõneks (string), kuna faili kirjutamine nõuab sõne andmetüüpi.
 
 ### 🔊 Heliefektide lisamine
 
-Esiteks peame sisse laadima helifailid, et saaksime neid mängu jooksul mängida.
+Et mängu huvitavamaks muuta, saame lisada erinevaid heliefekte, nagu taustamuusika, pommide lõhkemine ja puuviljade
+poolekslõikamine. Esiteks peame sisse laadima helifailid, et saaksime neid mängu jooksul mängida.
 
-Ava fail `resources.py`, ning lisa sinna `hurt_sound` ja `point_sound` muutujad. Abiks vaata, kuidas `flap_sound` on loodud.
+Ava fail `resources.py`, ning lisa sinna muutujad kõigi soovitud helide jaoks. Abiks vaata, kuidas on loodud muutuja
+`flute_sound`. Kõik meie poolt loodud helifailid võid leida kaustast `"assets/sounds"`, ning kui soovid kasutada hoopis
+enda helifaile, siis paiguta need sinnasamasse kausta!
 
-|**muutuja nimi**|**heliefekti asukoht**|
-|-|-|
-|`hurt_sound`|`sounds/hurt.wav`|
-|`point_sound`|`sounds/point.wav`|
+Failis `resources.py` võiks sisse laadida järgmised helid:
 
-&nbsp;
+1. Menüü taustamuusika (`soundtrack`);
+2. Mängu taustamuusika (`ambience`);
+3. Pommi viskamine (`bomb_throw`);
+4. Tavaline puuvilja viskamine (`fruit_throw`);
+5. Pommi lõhkemine (`explosion_sound`);
+6. Puuvilja lõikamine (`fruit_slice`);
+7. Puuvilja kaotamine (`miss_sound`).
 
-Failis `flappy_bird.py` on sulle ette toodud kohad, kus võiks mõni heliefekt mängida!
-Nendes kohtades on kirjas `# TODO: Play a sound!`
+Seejärel mine faili `fruit_ninja.py` ja lisa need heliefektid õigesse kohta, kus need peaksid mängima. Paljud sobivad
+kohad oleme me sinu jaoks juba üles otsinud, ning need on koodis märgitud kommentaariga
+`# TODO: Play the ... sound here!`.
 
 Et heliefekti mängida, pead kutsuma vastava heliefekti muutuja alt välja `.play()` meetodi.
 
-Näiteks, et mängida `flap_sound`-i, kirjutasime me mängukoodi, et kui mängija vajutab tühikule, siis ...
+Näiteks, et mängida `flute_sound`-i, kirjutasime me mängukoodi, et kui mängija alustab uut mängu, siis ...
 ```py
-flap_sound.play()
+flute_sound.play()
+```
+
+Taustamuusika võiks jääda end pärast laulu lõppemist kordama. Selleks saame `.play()` meetodile anda kaasa parameetri,
+mis ütleb talle, mitu korda see lugu end kordama peaks. Kui soovime, et lugu jääks end lõpmatult kordama, siis tuleks
+selle parameetri väärtuseks panna `-1`.
+```py
+soundtrack.play(-1)
 ```
 
 ### ⭐ Boonusülesanded
 - 👑 Tee nii, et skoori suurenedes läheks mäng kiiremaks või raskemaks.
-- 👑 Tee nii, et liikumisel taust vaikselt kaasa liiguks. *(Parallax scrolling)*
-- 👑 Lisa maapind.
-- 👑 Tee nii, et lind vaatab liikumise suunas üles/alla.
-- 👑 Lisa visuaalseid efekte? :)
+- 👑 Lisa mängu uue taustaga level
+- 👑 Vaheta välja mõni heliefekt
+- 👑 Lisa uusi puuvilju
+- 👑 Lisa visuaalseid efekte (näiteks puuviljadele "pooleks minemise" animatsioon või pommile plahvatamise animatsioon)
