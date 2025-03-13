@@ -38,7 +38,8 @@ class Game:
 
         # If another sound was being played, stop it.
         pygame.mixer.stop()
-        # TODO: Play the soundtrack here!
+
+        soundtrack.play(-1)
 
         self.life_images = [
             pygame.image.load(f"assets/lives/lives_{i}.png").convert_alpha() for i in range(4)
@@ -74,13 +75,13 @@ class Game:
         self.background = backgrounds[self.selected_map]
         pygame.mixer.stop()
         flute_sound.play()
-        # TODO: Play the ambience sound here!
+        ambience.play(-1)
 
         self.state = STATE_PLAYING
 
     def to_main_menu(self):
         pygame.mixer.stop()
-        # TODO: Play the soundtrack here!
+        soundtrack.play()
 
         self.score = 0
         self.lives = 3
@@ -89,7 +90,7 @@ class Game:
     def restart_game(self):
         pygame.mixer.stop()
         flute_sound.play()
-        # TODO: Play the ambience sound here!
+        ambience.play(-1)
 
         self.score = 0
         self.lives = 3
@@ -105,15 +106,14 @@ class Game:
         y = SCREEN_HEIGHT
         trajectory = (random.choice([-2, 2]), random.randint(-20, -18))
 
-        # TODO: Create a new Fruit using the provided parameters
-        #       and append it to the list self.fruits
+        new_fruit = Fruit(fruit_type, x, y, trajectory)
+
+        self.fruits.append(new_fruit)
 
         if fruit_type == "bomb":
-            # TODO: Play the bomb throw sound here!
-            ...
+            bomb_throw.play()
         else:
-            # TODO: Play the regular fruit throw sound here!
-            ...
+            fruit_throw.play()
 
     def load_highscore(self):
         try:
@@ -123,10 +123,12 @@ class Game:
             return 0
 
     def save_highscore(self):
-        # TODO: Write the current self.highscore to the file "highscore.txt".
-        #       If you get an error, then make sure you convert the high score
-        #       to str before writing it to the file.
-        ...
+        try:
+            with open("highscore.txt", "w") as file:
+                file.write(str(self.highscore))
+        except FileNotFoundError:
+            return 0
+                
 
     def handle_slicing(self):
         mouse_pos = pygame.mouse.get_pos()
@@ -134,23 +136,32 @@ class Game:
             if fruit.hitbox.collidepoint(mouse_pos) and not fruit.sliced:
                 fruit.slice()
                 if fruit.type == "bomb":
-                    # TODO: Oh no, we have sliced a bomb! Set self.lives to 0,
-                    #       self.state to STATE_GAME_OVER and clear self.fruits.
+                    self.lives = 0
+                    self.state = STATE_GAME_OVER
+                    self.fruits.clear()
 
-                    # TODO: Play the explosion sound here!
-                    ...
+                    explosion_sound.play()
                 else:
-                    # TODO: We have sliced a fruit, add +1 to self.score.
+                    self.score += 1
 
-                    # TODO: Play the fruit slicing sound here!
-                    ...
+                    fruit_slice.play()
                 if self.score > self.highscore:
                     self.highscore = self.score
 
 
     def update(self):
         # Spawn new fruits
-        if random.randint(1, 50) == 1:
+        modifier = 1
+
+        if self.score > 10:
+            modifier = 2
+        elif self.score > 50:
+            modifier = 3
+        elif self.score > 100:
+            modifier = 4
+        
+
+        if random.randint(1, 100 // modifier) == 1:
             self.spawn_fruit()
 
         self.fruits = [fruit for fruit in self.fruits if fruit.move()]
@@ -160,12 +171,13 @@ class Game:
             if fruit.y > SCREEN_HEIGHT and not fruit.sliced:
                 if fruit.type != "bomb":
                     self.lives -= 1
-                    # TODO: Play the missing fruit sound here!
+                    miss_sound.play()
 
                 self.fruits.remove(fruit)
 
-        # TODO: If self.lives is equal to zero or less than zero (<=), then
-        #       set self.state to STATE_GAME_OVER and clear self.fruits.
+        if self.lives <= 0:
+            self.state = STATE_GAME_OVER
+            self.fruits.clear()
 
     def update_positions(self):
         self.icon_x = SCREEN_WIDTH * 0.02

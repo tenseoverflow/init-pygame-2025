@@ -15,6 +15,13 @@ flute_sound = pygame.mixer.Sound("assets/sounds/flute.wav")
 # bomb explosion (kaboom.wav), missing a fruit (miss.wav),
 # slicing a fruit (slice.wav), and the main game soundtrack (soundtrack.wav).
 # You can also use your own sounds, any MP3 or WAV file should work fine!
+soundtrack = pygame.mixer.Sound("assets/sounds/soundtrack.wav")
+ambience = pygame.mixer.Sound("assets/sounds/ambience.wav")
+bomb_throw = pygame.mixer.Sound("assets/sounds/bomb_throw.wav")
+fruit_throw = pygame.mixer.Sound("assets/sounds/throw.wav")
+explosion_sound = pygame.mixer.Sound("assets/sounds/kaboom.wav")
+fruit_slice = pygame.mixer.Sound("assets/sounds/slice.wav")
+miss_sound = pygame.mixer.Sound("assets/sounds/miss.wav")
 
 big_font = pygame.font.Font('assets/fonts/gamecamper.ttf', 36)
 font = pygame.font.Font('assets/fonts/gamecamper-lite.ttf', 24)
